@@ -1,0 +1,88 @@
+/* Custom AdminLTE Styles para mejorar visualización de submenús */
+
+/* Estilos para items del submenú */
+.nav-treeview {
+    /* Las filas del submenú con fondo ligeramente diferente */
+}
+
+.nav-treeview > .nav-item > .nav-link {
+    /* Items del submenú */
+    font-size: 0.875rem; /* Más pequeño que el item principal */
+    padding-left: 2rem; /* Mayor indentación a la izquierda para desplazamiento */
+    padding-right: 1rem;
+    font-weight: 400;
+    color: rgba(255, 255, 255, 0.8);
+    border-left: 3px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.nav-treeview > .nav-item > .nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-left-color: rgba(255, 255, 255, 0.4);
+    color: #fff;
+}
+
+/* Cuando el item del submenú está activo */
+.nav-treeview > .nav-item > .nav-link.active {
+    background-color: rgba(255, 255, 255, 0.15);
+    border-left-color: #fff;
+    color: #fff;
+    font-weight: 500;
+}
+
+/* Icono del submenú más pequeño */
+.nav-treeview .nav-icon {
+    font-size: 0.75rem;
+    margin-right: 0.5rem;
+}
+
+/* Items principales del menú - para contraste */
+.sidebar-menu > .nav-item > .nav-link {
+    font-size: 1rem;
+    font-weight: 500;
+    padding-left: 1.5rem;
+}
+
+.sidebar-menu > .nav-item > .nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Padre de submenú cuando está abierto */
+.sidebar-menu > .nav-item.menu-open > .nav-link {
+    background-color: rgba(0, 0, 0, 0.1);
+    font-weight: 600;
+}
+
+/* Asegurar que el submenú padre esté destacado */
+.sidebar-menu > .nav-item > .nav-link.active {
+    background-color: rgba(255, 255, 255, 0.15);
+    font-weight: 600;
+}
+
+/* Efecto visual de separación entre padres e hijos */
+.sidebar-menu > .nav-item {
+    margin-bottom: 0.25rem;
+}
+
+.nav-treeview {
+    margin-top: 0.25rem;
+    margin-bottom: 0.5rem;
+}
+
+/* Ícono de chevron del submenú */
+.sidebar-menu .nav-link > p > .right {
+    position: absolute;
+    right: 1rem;
+    font-size: 0.875rem;
+}
+
+/* Animación suave del chevron cuando se abre el submenú */
+.nav-item.menu-open > .nav-link > p > .right {
+    transform: rotate(-90deg);
+    transition: transform 0.3s ease;
+}
+
+/* Línea divisoria visual opcional para mayor distinción */
+.sidebar-menu > .nav-item.menu-open {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
