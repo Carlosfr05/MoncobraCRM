@@ -1,0 +1,388 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+ 
+/* ============================================================
+   RESET & BASE
+   ============================================================ */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+ 
+html, body {
+    height: 100%;
+}
+ 
+body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background: #F0F4FA;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 1.5rem;
+}
+ 
+/* Textura de puntos sutil */
+body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: radial-gradient(rgba(0,0,0,0.04) 1px, transparent 1px);
+    background-size: 22px 22px;
+    pointer-events: none;
+    z-index: 0;
+}
+ 
+/* ============================================================
+   TARJETA PRINCIPAL
+   ============================================================ */
+.register-card {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 450px;
+    background: #ffffff;
+    border-radius: 16px;
+    border: 1px solid #E4EAF3;
+    box-shadow:
+        0 2px 4px rgba(0,0,0,0.04),
+        0 12px 40px rgba(0,0,0,0.07);
+    padding: 2.75rem 2.5rem;
+    animation: cardIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+ 
+@keyframes cardIn {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+ 
+/* ============================================================
+   LOGO
+   ============================================================ */
+.register-logo {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    margin-bottom: 2.25rem;
+}
+ 
+.logo-icon {
+    width: 34px;
+    height: 34px;
+    background: #2563EB;
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+ 
+.logo-icon svg {
+    width: 18px;
+    height: 18px;
+    stroke: #fff;
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+ 
+.logo-text {
+    font-size: 17px;
+    font-weight: 700;
+    color: #0D1B36;
+    letter-spacing: -0.3px;
+}
+ 
+.logo-text span {
+    color: #2563EB;
+}
+ 
+/* ============================================================
+   CABECERA
+   ============================================================ */
+.form-header {
+    margin-bottom: 2rem;
+}
+ 
+.form-title {
+    font-size: 1.55rem;
+    font-weight: 700;
+    color: #0D1B36;
+    letter-spacing: -0.4px;
+    line-height: 1.2;
+    margin-bottom: 0.4rem;
+}
+ 
+.form-subtitle {
+    font-size: 14px;
+    color: #7B8AA0;
+    font-weight: 400;
+    line-height: 1.5;
+}
+ 
+/* ============================================================
+   CAMPOS
+   ============================================================ */
+.field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 1.1rem;
+    margin-bottom: 1.25rem;
+}
+ 
+.field-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+ 
+.field-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #3B4A63;
+}
+ 
+.field-input-wrap {
+    position: relative;
+}
+ 
+.field-icon {
+    position: absolute;
+    left: 0.9rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #B2BECC;
+    font-size: 13px;
+    pointer-events: none;
+    transition: color 0.2s ease;
+}
+ 
+.custom-input {
+    width: 100%;
+    background: #FAFBFD;
+    border: 1.5px solid #E2E8F2;
+    border-radius: 9px;
+    padding: 0.8rem 1rem 0.8rem 2.6rem;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 14.5px;
+    font-weight: 400;
+    color: #0D1B36;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    outline: none;
+    -webkit-appearance: none;
+    appearance: none;
+}
+ 
+.custom-input::placeholder {
+    color: #B8C4D4;
+}
+ 
+.custom-input:focus {
+    border-color: #2563EB;
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+ 
+.field-input-wrap:focus-within .field-icon {
+    color: #2563EB;
+}
+ 
+.custom-input.is-invalid {
+    border-color: #EF4444;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.09);
+}
+ 
+.invalid-feedback {
+    font-size: 12.5px;
+    font-weight: 500;
+    color: #EF4444;
+    margin-top: 0.3rem;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+ 
+.invalid-feedback::before {
+    content: '!';
+    width: 14px;
+    height: 14px;
+    background: #EF4444;
+    color: #fff;
+    border-radius: 50%;
+    font-size: 9px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+ 
+/* ============================================================
+   TÉRMINOS DE SERVICIO
+   ============================================================ */
+.terms-wrap {
+    margin-bottom: 1.5rem;
+}
+ 
+.terms-check {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.45rem;
+    cursor: pointer;
+}
+ 
+.terms-check input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    min-width: 16px;
+    border-radius: 4px;
+    margin-top: 2px;
+    cursor: pointer;
+    accent-color: #2563EB;
+    flex-shrink: 0;
+}
+ 
+.terms-label {
+    font-size: 13px;
+    font-weight: 400;
+    color: #4B5E78;
+    cursor: pointer;
+    user-select: none;
+    line-height: 1.5;
+}
+ 
+.terms-link {
+    color: #2563EB;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.2s ease;
+}
+ 
+.terms-link:hover {
+    color: #1D4ED8;
+    text-decoration: underline;
+}
+ 
+/* ============================================================
+   BOTÓN SUBMIT
+   ============================================================ */
+.submit-btn {
+    width: 100%;
+    background: #2563EB;
+    border: none;
+    border-radius: 9px;
+    padding: 0.875rem 1.5rem;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 14.5px;
+    font-weight: 600;
+    color: #fff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+    box-shadow: 0 1px 3px rgba(37, 99, 235, 0.25), 0 4px 12px rgba(37, 99, 235, 0.2);
+}
+ 
+.submit-btn:hover {
+    background: #1D4ED8;
+    box-shadow: 0 2px 6px rgba(37, 99, 235, 0.3), 0 8px 20px rgba(37, 99, 235, 0.25);
+    transform: translateY(-1px);
+}
+ 
+.submit-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 3px rgba(37, 99, 235, 0.2);
+}
+ 
+.submit-btn-icon {
+    font-size: 12px;
+}
+ 
+/* ============================================================
+   DIVISOR + ENLACE LOGIN
+   ============================================================ */
+.form-divider {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin: 2rem 0 1.5rem;
+    opacity: 0.6;
+}
+ 
+.form-divider-line {
+    flex: 1;
+    height: 1px;
+    background: #E4EAF3;
+}
+ 
+.form-divider-text {
+    font-size: 12px;
+    font-weight: 600;
+    color: #7B8AA0;
+    white-space: nowrap;
+}
+ 
+.login-wrap {
+    text-align: center;
+}
+ 
+.login-wrap p {
+    margin: 0;
+}
+ 
+.login-link {
+    font-size: 13px;
+    font-weight: 600;
+    color: #2563EB;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+ 
+.login-link:hover {
+    color: #1D4ED8;
+    text-decoration: underline;
+}
+ 
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 576px) {
+    body {
+        padding: 1rem;
+    }
+ 
+    .register-card {
+        max-width: 100%;
+        padding: 2rem 1.5rem;
+    }
+ 
+    .form-title {
+        font-size: 1.35rem;
+    }
+ 
+    .form-subtitle {
+        font-size: 13px;
+    }
+ 
+    .field-group {
+        gap: 1rem;
+    }
+ 
+    .custom-input {
+        font-size: 14px;
+        padding: 0.75rem 1rem 0.75rem 2.4rem;
+    }
+ 
+    .terms-label {
+        font-size: 12px;
+    }
+ 
+    .submit-btn {
+        padding: 0.8rem 1.2rem;
+        font-size: 14px;
+    }
+}

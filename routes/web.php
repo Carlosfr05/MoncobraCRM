@@ -17,8 +17,8 @@ use App\Http\Controllers\HistoricoController;
 // 1. CAMBIO: Nombre de ruta único para la página de bienvenida.
 // Antes se llamaba 'dashboard', ahora 'welcome'.
 Route::get('/', function () {
-    return view('welcome');
-})->name('welcome');
+    return auth()->check() ? redirect()->route('dashboard') : redirect()->route('login');
+});
 
 // Authentication Routes
 Auth::routes();
