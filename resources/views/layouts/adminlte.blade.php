@@ -6,29 +6,73 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'MoncobraCRM')</title>
 
-    <!-- AdminLTE CSS -->
     <link rel="stylesheet" href="{{ asset('node_modules/admin-lte/dist/css/adminlte.min.css') }}">
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="{{ asset('node_modules/@fortawesome/fontawesome-free/css/all.min.css') }}">
-    <!-- iCheck for checkboxes and radio inputs -->
     <link rel="stylesheet" href="{{ asset('node_modules/icheck-bootstrap/icheck-bootstrap.min.css') }}">
 
     @yield('styles')
+
+    <style>
+    /* === CONTROL TOTAL DE VISIBILIDAD DE MENÚS === */
+    
+    /* Mostrar submenús cuando el padre tiene la clase 'menu-open' */
+    .nav.nav-pills .nav-item.menu-open > .nav-treeview {
+        display: block !important;
+        height: auto !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        max-height: 9999px !important;
+    }
+
+    /* Ocultar submenús si NO tienen la clase 'menu-open' */
+    .nav.nav-pills .nav-item:not(.menu-open) > .nav-treeview {
+        display: none !important;
+        height: 0 !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        max-height: 0 !important;
+    }
+
+    /* Remover transiciones de AdminLTE que causan problemas */
+    .nav.nav-pills .nav-treeview {
+        transition: none !important;
+        overflow: visible !important;
+    }
+
+    /* Espaciado para indentación visual */
+    .nav.nav-pills .nav-treeview {
+        padding-left: 15px;
+    }
+
+    /* Forzar que los enlaces del menú no sean draggables ni tengan comportamiento raro */
+    .nav.nav-pills .nav-item > a[href="#"] {
+        cursor: pointer;
+        user-select: none;
+    }
+
+    /* Sobreescribir estilos de AdminLTE */
+    .nav.nav-pills .nav-item {
+        position: relative !important;
+    }
+</style>
+
+    <!-- Bloquear el Treeview de AdminLTE ANTES de que cargue -->
+    <script>
+    // Configuración: El accordion está deshabilitado en node_modules/admin-lte/src/ts/treeview.ts
+    // Esto permite que múltiples menús estén abiertos simultáneamente
+    console.log('[MenuFix] Sistema de menús configurado para modo no-accordion');
+    </script>
 </head>
 <body class="hold-transition sidebar-mini layout-fixed">
     <div class="wrapper">
-        <!-- Navbar -->
         <nav class="main-header navbar navbar-expand navbar-white navbar-light">
-            <!-- Left navbar links -->
             <ul class="navbar-nav">
                 <li class="nav-item">
                     <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
                 </li>
             </ul>
 
-            <!-- Right navbar links -->
             <ul class="navbar-nav ml-auto">
-                <!-- User Account Menu -->
                 <li class="nav-item dropdown">
                     <a class="nav-link" data-toggle="dropdown" href="#">
                         <i class="fas fa-user-circle"></i>
@@ -51,19 +95,15 @@
             </ul>
         </nav>
 
-        <!-- Left side column. contains the sidebar -->
         <aside class="main-sidebar sidebar-dark-primary elevation-4">
-            <!-- Brand Logo -->
             <a href="{{ route('dashboard') }}" class="brand-link">
-                <img src="https://via.placeholder.com/40" alt="MoncobraCRM Logo" class="brand-image img-circle elevation-3"
-                     style="opacity: 0.8">
+                <img src="https://via.placeholder.com/40" alt="Logo" class="brand-image img-circle elevation-3" style="opacity: 0.8">
                 <span class="brand-text font-weight-light">MoncobraCRM</span>
             </a>
 
-            <!-- Sidebar Menu -->
-            <nav class="mt-2">
-                <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-                    <!-- Panel de Control (Dashboard) -->
+            <nav class="mt-2" data-lte-toggle="treeview" data-accordion="false">
+                <ul class="nav nav-pills mi-sidebar-personal flex-column" role="menu">
+                    
                     <li class="nav-item">
                         <a href="{{ route('dashboard') }}" class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">
                             <i class="nav-icon fas fa-th-large"></i>
@@ -71,9 +111,8 @@
                         </a>
                     </li>
 
-                    <!-- Área Clientes -->
                     <li class="nav-item {{ request()->is('clientes*', 'albaranes*', 'presupuestos*', 'bolsa*') ? 'menu-open' : '' }}">
-                        <a href="#" class="nav-link {{ request()->is('clientes*', 'albaranes*', 'presupuestos*', 'bolsa*') ? 'active' : '' }}">
+                        <a href="#" data-lte-toggle="treeview" class="nav-link {{ request()->is('clientes*', 'albaranes*', 'presupuestos*', 'bolsa*') ? 'active' : '' }}">
                             <i class="nav-icon fas fa-users"></i>
                             <p>
                                 Área Clientes
@@ -83,34 +122,19 @@
                         <ul class="nav nav-treeview">
                             <li class="nav-item">
                                 <a href="{{ route('clientes.index') }}" class="nav-link {{ request()->routeIs('clientes.*') ? 'active' : '' }}">
-                                    <i class="far fa-circle nav-icon"></i>
-                                    <p>Gestión Clientes</p>
+                                    <i class="far fa-circle nav-icon"></i> <p>Gestión Clientes</p>
                                 </a>
                             </li>
                             <li class="nav-item">
                                 <a href="{{ route('albaranes.index') }}" class="nav-link {{ request()->routeIs('albaranes.*') ? 'active' : '' }}">
-                                    <i class="far fa-circle nav-icon"></i>
-                                    <p>Albaranes Clientes</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{{ route('presupuestos.index') }}" class="nav-link {{ request()->routeIs('presupuestos.*') ? 'active' : '' }}">
-                                    <i class="far fa-circle nav-icon"></i>
-                                    <p>Presupuestos</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{{ route('bolsa.index') }}" class="nav-link {{ request()->routeIs('bolsa.*') ? 'active' : '' }}">
-                                    <i class="far fa-circle nav-icon"></i>
-                                    <p>Bolsa Clientes</p>
+                                    <i class="far fa-circle nav-icon"></i> <p>Albaranes Clientes</p>
                                 </a>
                             </li>
                         </ul>
                     </li>
 
-                    <!-- Área Proveedores -->
                     <li class="nav-item {{ request()->is('proveedores*', 'albaranes-proveedores*', 'pedidos*') ? 'menu-open' : '' }}">
-                        <a href="#" class="nav-link {{ request()->is('proveedores*', 'albaranes-proveedores*', 'pedidos*') ? 'active' : '' }}">
+                        <a href="#" data-lte-toggle="treeview" class="nav-link {{ request()->is('proveedores*', 'albaranes-proveedores*', 'pedidos*') ? 'active' : '' }}">
                             <i class="nav-icon fas fa-building"></i>
                             <p>
                                 Área Proveedores
@@ -120,114 +144,100 @@
                         <ul class="nav nav-treeview">
                             <li class="nav-item">
                                 <a href="{{ route('proveedores.index') }}" class="nav-link {{ request()->routeIs('proveedores.*') ? 'active' : '' }}">
-                                    <i class="far fa-circle nav-icon"></i>
-                                    <p>Gestión de Proveedores</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{{ route('albaranes-proveedores.index') }}" class="nav-link {{ request()->routeIs('albaranes-proveedores.*') ? 'active' : '' }}">
-                                    <i class="far fa-circle nav-icon"></i>
-                                    <p>Albaranes de Proveedores</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{{ route('pedidos.index') }}" class="nav-link {{ request()->routeIs('pedidos.*') ? 'active' : '' }}">
-                                    <i class="far fa-circle nav-icon"></i>
-                                    <p>Pedidos</p>
+                                    <i class="far fa-circle nav-icon"></i> <p>Gestión de Proveedores</p>
                                 </a>
                             </li>
                         </ul>
                     </li>
 
-                    <!-- Productos -->
                     <li class="nav-item">
                         <a href="{{ route('productos.index') }}" class="nav-link {{ request()->routeIs('productos.*') ? 'active' : '' }}">
-                            <i class="nav-icon fas fa-boxes"></i>
-                            <p>Productos</p>
-                        </a>
-                    </li>
-
-                    <!-- Histórico -->
-                    <li class="nav-item">
-                        <a href="{{ route('historico.index') }}" class="nav-link {{ request()->routeIs('historico.*') ? 'active' : '' }}">
-                            <i class="nav-icon fas fa-history"></i>
-                            <p>Histórico</p>
-                        </a>
-                    </li>
-
-                    <!-- Inventario -->
-                    <li class="nav-item">
-                        <a href="{{ route('inventario.index') }}" class="nav-link {{ request()->routeIs('inventario.*') ? 'active' : '' }}">
-                            <i class="nav-icon fas fa-warehouse"></i>
-                            <p>Inventario</p>
+                            <i class="nav-icon fas fa-boxes"></i> <p>Productos</p>
                         </a>
                     </li>
                 </ul>
             </nav>
         </aside>
 
-        <!-- Content Wrapper. Contains page content -->
         <div class="content-wrapper">
-            <!-- Content Header (Page header) -->
             <div class="content-header">
                 <div class="container-fluid">
-                    <div class="row mb-2">
-                        <div class="col-sm-6">
-                            <h1 class="m-0">@yield('header-title')</h1>
-                        </div>
-                    </div>
+                    <h1 class="m-0">@yield('header-title')</h1>
                 </div>
             </div>
 
-            <!-- Main content -->
             <div class="content">
                 <div class="container-fluid">
-                    @if ($errors->any())
-                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                            <strong>Error:</strong>
-                            <ul class="mb-0">
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                    @endif
-
-                    @if (session('success'))
-                        <div class="alert alert-success alert-dismissible fade show" role="alert">
-                            {{ session('success') }}
-                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                    @endif
-
                     @yield('content')
                 </div>
             </div>
         </div>
 
-        <!-- Footer -->
         <footer class="main-footer">
-            <div class="float-right d-none d-sm-inline">
-                <b>Version</b> 1.0.0
-            </div>
-            <strong>MoncobraCRM</strong> &copy; 2026. Todos los derechos reservados.
+            <strong>MoncobraCRM &copy; 2026</strong>
         </footer>
     </div>
 
-    <!-- AdminLTE JS -->
-    <script src="{{ asset('node_modules/admin-lte/dist/js/adminlte.min.js') }}"></script>
-    <!-- jQuery -->
     <script src="{{ asset('node_modules/jquery/dist/jquery.min.js') }}"></script>
-    <!-- Bootstrap -->
     <script src="{{ asset('node_modules/bootstrap/dist/js/bootstrap.bundle.min.js') }}"></script>
-    <!-- Font Awesome (si lo necesitas para más iconos) -->
-    <script src="{{ asset('node_modules/@fortawesome/fontawesome-free/js/all.min.js') }}"></script>
+    
+    <!-- LOG INMEDIATO -->
+    <script>
+    console.log('[MenuFix] Script iniciado ANTES de AdminLTE');
+    </script>
+    
+    <script src="{{ asset('node_modules/admin-lte/dist/js/adminlte.min.js') }}"></script>
 
     @yield('scripts')
+
+    <!-- LOG Y FIX DESPUÉS DE ADMINLTE -->
+    <script>
+    console.log('[MenuFix] Script ejecutado DESPUÉS de AdminLTE');
+    
+    // Intentar inmediatamente
+    (function() {
+        console.log('[MenuFix] IIFE iniciado');
+        
+        // Buscar botones
+        var buttons = document.querySelectorAll('[data-lte-toggle="treeview"]');
+        console.log('[MenuFix] Botones encontrados:', buttons.length);
+        
+        if (buttons.length === 0) {
+            console.log('[MenuFix] ❌ NO SE ENCONTRARON BOTONES CON data-lte-toggle="treeview"');
+            return;
+        }
+        
+        // Procesar cada botón
+        buttons.forEach(function(btn, index) {
+            console.log('[MenuFix] Procesando botón', index);
+            
+            // Remover listeners antiguos
+            var clone = btn.cloneNode(true);
+            btn.parentNode.replaceChild(clone, btn);
+            
+            // Agregar nuevo listener
+            clone.addEventListener('click', function(e) {
+                console.log('[MenuFix] ✓ CLICK DETECTADO');
+                e.preventDefault();
+                e.stopPropagation();
+                e.stopImmediatePropagation();
+                
+                var navItem = this.closest('.nav-item');
+                if (!navItem) {
+                    console.log('[MenuFix] ❌ Nav-item no encontrado');
+                    return;
+                }
+                
+                // Toggle
+                navItem.classList.toggle('menu-open');
+                console.log('[MenuFix] TOGGLE realizado, ahora:', navItem.classList.contains('menu-open'));
+                
+                return false;
+            });
+        });
+        
+        console.log('[MenuFix] ✓ Sistema completamente inicializado');
+    })();
+    </script>
 </body>
 </html>

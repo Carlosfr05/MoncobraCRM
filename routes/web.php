@@ -14,10 +14,11 @@ use App\Http\Controllers\ProductoController;
 use App\Http\Controllers\InventarioController;
 use App\Http\Controllers\HistoricoController;
 
-// Public Routes
+// 1. CAMBIO: Nombre de ruta único para la página de bienvenida.
+// Antes se llamaba 'dashboard', ahora 'welcome'.
 Route::get('/', function () {
     return view('welcome');
-})->name('home');
+})->name('welcome');
 
 // Authentication Routes
 Auth::routes();
@@ -25,7 +26,8 @@ Auth::routes();
 // Protected Routes (Require Authentication)
 Route::middleware('auth')->group(function () {
     
-    // Dashboard
+    // 2. Dashboard Real
+    // Esta es la ruta a la que apunta el RouteServiceProvider que cambiamos antes.
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     
     // Profile
@@ -42,8 +44,10 @@ Route::middleware('auth')->group(function () {
     Route::resource('proveedores', ProveedorController::class);
     Route::resource('albaranes-proveedores', AlbaranProveedorController::class);
     Route::resource('pedidos', PedidoController::class);
-    Route::resource('productos', ProductoController::class)->only('index');
+    
+    // Nota: 'only' limita las rutas generadas para optimizar el sistema.
+    Route::resource('productos', ProductoController::class)->only(['index']);
     Route::resource('inventario', InventarioController::class);
-    Route::resource('historico', HistoricoController::class)->only('index');
+    Route::resource('historico', HistoricoController::class)->only(['index']);
     
 });

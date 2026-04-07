@@ -16,7 +16,7 @@
 <body class="hold-transition login-page" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
     <div class="login-box">
         <div class="login-logo">
-            <a href="{{ route('home') }}">
+            <a href="{{ route('dashboard') }}">
                 <b>Moncobra</b>CRM
             </a>
         </div>

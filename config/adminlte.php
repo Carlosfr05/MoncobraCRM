@@ -368,7 +368,7 @@ return [
                     'active' => ['proveedores*'],
                 ],
                 [
-                    'text' => 'Albaranes de Proveedores',
+                    'text' => 'Albaranes Proveedor',
                     'url' => 'albaranes-proveedores',
                     'icon' => 'fas fa-fw fa-file-invoice',
                     'active' => ['albaranes-proveedores*'],

@@ -139,6 +139,58 @@
     {{-- Custom Scripts --}}
     @yield('adminlte_js')
 
+    <!-- FIX PARA MENÚ SIN ACCORDION -->
+    <script>
+    console.log('[MenuFix] Sistema de menú sin accordion iniciado');
+    
+    // Ejecutar inmediatamente
+    (function() {
+        console.log('[MenuFix] IIFE ejecutada');
+        
+        // Buscar botones de treeview - múltiples selectores
+        var buttons = document.querySelectorAll('[data-lte-toggle="treeview"], .nav-link[href=""]');
+        console.log('[MenuFix] Botones encontrados:', buttons.length);
+        
+        // Si hay botones, procesar
+        if (buttons.length > 0) {
+            buttons.forEach(function(btn, idx) {
+                // Saltar si no tiene href vacio o data-lte-toggle
+                if (btn.getAttribute('href') !== '' && !btn.hasAttribute('data-lte-toggle')) {
+                    return;
+                }
+                
+                console.log('[MenuFix] Botón', idx, '- Clonando para remover listeners');
+                
+                // Clonar para remover listeners
+                var clone = btn.cloneNode(true);
+                btn.parentNode.replaceChild(clone, btn);
+                
+                // Agregar nuevo listener
+                clone.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    e.stopImmediatePropagation();
+                    
+                    console.log('[MenuFix] ✓ CLICK EN BOTÓN:', this.querySelector('p')?.textContent || 'desconocido');
+                    
+                    var navItem = this.closest('.nav-item');
+                    if (navItem) {
+                        var wasOpen = navItem.classList.contains('menu-open');
+                        navItem.classList.toggle('menu-open');
+                        console.log('[MenuFix] Toggle:', wasOpen, '→', navItem.classList.contains('menu-open'));
+                    }
+                    
+                    return false;
+                });
+            });
+            
+            console.log('[MenuFix] ✓✓✓ FIX COMPLETAMENTE APLICADO');
+        } else {
+            console.log('[MenuFix] ❌ NO HAY BOTONES');
+        }
+    })();
+    </script>
+
 </body>
 
 </html>
