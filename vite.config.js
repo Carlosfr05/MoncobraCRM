@@ -9,6 +9,7 @@ export default defineConfig({
                 'resources/js/app.js',
                 'resources/css/login.css',
                 'resources/css/register.css',
+                'resources/css/reset-password.css',
             ],
             refresh: true,
         }),

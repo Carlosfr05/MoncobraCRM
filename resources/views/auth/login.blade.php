@@ -97,20 +97,6 @@
         </button>
  
     </form>
- 
-    <!-- Divider + Registro -->
-    <div class="form-divider">
-        <div class="form-divider-line"></div>
-        <span class="form-divider-text">¿Eres nuevo aquí?</span>
-        <div class="form-divider-line"></div>
-    </div>
- 
-    <div class="register-wrap">
-        <p>
-            <a href="{{ route('register') }}" class="register-link">Crear una cuenta gratuita →</a>
-        </p>
-    </div>
- 
 </div>
  
 </body>
