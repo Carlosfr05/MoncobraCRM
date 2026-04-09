@@ -37,15 +37,30 @@ class ProfileController extends Controller
      */
     public function update(Request $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users,email,' . Auth::id(),
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'max:255', 'unique:users,email,' . Auth::id()],
+            'telefono' => ['nullable', 'string', 'max:20'],
+            'descripcion' => ['nullable', 'string', 'max:500'],
+            'avatar' => ['nullable', 'image', 'max:2048'],
         ]);
 
-        Auth::user()->update([
-            'name' => $request->name,
-            'email' => $request->email,
-        ]);
+        $user = Auth::user();
+
+        // Manejar upload de avatar
+        if ($request->hasFile('avatar')) {
+            // Eliminar avatar anterior si existe
+            if ($user->avatar && \Storage::exists('public/' . $user->avatar)) {
+                \Storage::delete('public/' . $user->avatar);
+            }
+            
+            // Guardar nuevo avatar
+            $path = $request->file('avatar')->store('avatars', 'public');
+            $validated['avatar'] = $path;
+        }
+
+        // Actualizar usuario
+        $user->update($validated);
 
         return redirect()->route('profile.show')->with('success', 'Perfil actualizado correctamente');
     }

@@ -22,6 +22,13 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role',
+        'proyecto_id',
+        'descripcion',
+        'telefono',
+        'avatar',
+        'activo',
+        'ultimo_acceso',
     ];
 
     /**
@@ -44,6 +51,16 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'activo' => 'boolean',
+            'ultimo_acceso' => 'datetime',
         ];
+    }
+
+    /**
+     * Get the proyecto that the user belongs to.
+     */
+    public function proyecto()
+    {
+        return $this->belongsTo(Proyecto::class, 'proyecto_id');
     }
 }

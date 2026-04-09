@@ -2,86 +2,154 @@
 
 @section('title', 'Mi Perfil - MoncobraCRM')
 
-@section('header-title')
-    <i class="fas fa-user"></i> Mi Perfil
-@endsection
+@push('css')
+    @vite(['resources/css/show_profile.css'])
+@endpush
 
 @section('content')
-    <div class="row">
-        <div class="col-md-8">
-            <div class="card card-primary">
-                <div class="card-header">
-                    <h3 class="card-title">Información del Perfil</h3>
-                </div>
-                <div class="card-body">
-                    <div class="form-group">
-                        <label>Nombre</label>
-                        <input type="text" class="form-control" value="{{ Auth::user()->name }}" disabled>
+
+<div class="profile-wrapper" style="margin: 0 auto; padding: 20px;">
+
+    <!-- Banner superior -->
+    <div class="profile-banner"></div>
+
+    <!-- Tarjeta principal -->
+    <div class="profile-card">
+
+        <!-- Fila avatar + botones -->
+        <div class="avatar-row">
+            <div class="avatar-wrapper">
+                @if (Auth::user()->avatar)
+                    <img
+                        src="{{ asset('storage/' . Auth::user()->avatar) }}"
+                        alt="{{ Auth::user()->name }}"
+                        class="avatar-image"
+                    >
+                @else
+                    <div class="avatar-placeholder">
+                        {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}{{ strtoupper(substr(strstr(Auth::user()->name, ' '), 1, 1)) }}
                     </div>
-                    <div class="form-group">
-                        <label>Email</label>
-                        <input type="email" class="form-control" value="{{ Auth::user()->email }}" disabled>
-                    </div>
-                    <div class="form-group">
-                        <label>Registrado desde</label>
-                        <input type="text" class="form-control" value="{{ Auth::user()->created_at->format('d/m/Y H:i') }}" disabled>
-                    </div>
-                </div>
-                <div class="card-footer">
-                    <a href="{{ route('profile.edit') }}" class="btn btn-primary">
-                        <i class="fas fa-edit"></i> Editar Perfil
-                    </a>
+                @endif
+            </div>
+
+            <div class="avatar-actions">
+                <a href="{{ route('dashboard') }}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Dashboard
+                </a>
+                <a href="{{ route('profile.edit') }}" class="btn btn-primary">
+                    <i class="fas fa-pen"></i> Editar perfil
+                </a>
+            </div>
+        </div>
+
+        <!-- Nombre y email -->
+        <div class="profile-name">{{ Auth::user()->name }}</div>
+        <div class="profile-email">{{ Auth::user()->email }}</div>
+
+        <!-- Badges de rol, estado y proyecto -->
+        <div class="badges-row">
+
+            @if (Auth::user()->role === 'superadmin')
+                <span class="badge badge-role-superadmin">
+                    <i class="fas fa-crown" style="font-size:11px"></i> Super Admin
+                </span>
+            @elseif (Auth::user()->role === 'admin')
+                <span class="badge badge-role-admin">
+                    <i class="fas fa-user-shield" style="font-size:11px"></i> Administrador
+                </span>
+            @else
+                <span class="badge badge-role-user">
+                    <i class="fas fa-user" style="font-size:11px"></i> Usuario
+                </span>
+            @endif
+
+            @if (Auth::user()->activo)
+                <span class="badge badge-active">
+                    <i class="fas fa-circle" style="font-size:8px"></i> Activo
+                </span>
+            @else
+                <span class="badge badge-inactive">
+                    <i class="fas fa-circle" style="font-size:8px"></i> Inactivo
+                </span>
+            @endif
+
+            @if (Auth::user()->proyecto)
+                <span class="badge badge-project">
+                    <i class="fas fa-building" style="font-size:10px"></i>
+                    {{ Auth::user()->proyecto->nombre }}
+                </span>
+            @endif
+
+        </div>
+
+        <!-- Divider -->
+        <div class="section-divider"></div>
+
+        <!-- Información Personal -->
+        <div class="section-label">Información personal</div>
+
+        <div class="info-grid">
+            <div class="info-item">
+                <div class="info-label">Nombre completo</div>
+                <div class="info-value">{{ Auth::user()->name }}</div>
+            </div>
+
+            <div class="info-item">
+                <div class="info-label">Correo electrónico</div>
+                <div class="info-value">{{ Auth::user()->email }}</div>
+            </div>
+
+            <div class="info-item">
+                <div class="info-label">Teléfono</div>
+                @if (Auth::user()->telefono)
+                    <div class="info-value">{{ Auth::user()->telefono }}</div>
+                @else
+                    <div class="info-value muted">No especificado</div>
+                @endif
+            </div>
+
+            <div class="info-item">
+                <div class="info-label">Proyecto / Sucursal</div>
+                <div class="info-value">
+                    {{ Auth::user()->proyecto?->nombre ?? 'Acceso a todos los proyectos' }}
                 </div>
             </div>
         </div>
 
-        <div class="col-md-4">
-            <div class="card card-info">
-                <div class="card-header">
-                    <h3 class="card-title">Seguridad</h3>
-                </div>
-                <div class="card-body">
-                    <p>Última sesión: <strong>{{ now()->format('d/m/Y H:i') }}</strong></p>
-                    <button class="btn btn-warning btn-block" data-toggle="modal" data-target="#changePasswordModal">
-                        <i class="fas fa-lock"></i> Cambiar Contraseña
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
+        <!-- Descripción (condicional) -->
+        @if (Auth::user()->descripcion)
+            <div class="section-divider"></div>
+            <div class="section-label">Descripción</div>
+            <div class="description-box">{{ Auth::user()->descripcion }}</div>
+        @endif
 
-    <!-- Modal Cambiar Contraseña -->
-    <div class="modal fade" id="changePasswordModal" tabindex="-1" role="dialog">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Cambiar Contraseña</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+        <!-- Divider -->
+        <div class="section-divider"></div>
+
+        <!-- Información de Cuenta -->
+        <div class="section-label">Información de cuenta</div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Cuenta creada</div>
+                <div class="stat-value">{{ Auth::user()->created_at->format('d/m/Y H:i') }}</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-label">Última actualización</div>
+                <div class="stat-value">{{ Auth::user()->updated_at->format('d/m/Y H:i') }}</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-label">Último acceso</div>
+                <div class="stat-value">
+                    {{ Auth::user()->ultimo_acceso?->format('d/m/Y H:i') ?? 'Primera sesión' }}
                 </div>
-                <form action="{{ route('profile.update-password') }}" method="POST">
-                    @csrf
-                    <div class="modal-body">
-                        <div class="form-group">
-                            <label>Contraseña Actual</label>
-                            <input type="password" name="current_password" class="form-control" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Nueva Contraseña</label>
-                            <input type="password" name="password" class="form-control" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Confirmar Contraseña</label>
-                            <input type="password" name="password_confirmation" class="form-control" required>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-primary">Guardar Cambios</button>
-                    </div>
-                </form>
             </div>
         </div>
-    </div>
+
+    </div><!-- /.profile-card -->
+
+</div><!-- /.profile-wrapper -->
+
 @endsection
