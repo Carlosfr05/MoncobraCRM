@@ -63,12 +63,12 @@ return [
     |
     */
 
-    'logo' => '<b>Admin</b>LTE',
-    'logo_img' => 'vendor/adminlte/dist/img/AdminLTELogo.png',
+    'logo' => 'Moncobra<b>CRM</b>',
+    'logo_img' => null,
     'logo_img_class' => 'brand-image img-circle elevation-3',
     'logo_img_xl' => null,
     'logo_img_xl_class' => 'brand-image-xs',
-    'logo_img_alt' => 'Admin Logo',
+    'logo_img_alt' => 'Moncobra Logo',
 
     /*
     |--------------------------------------------------------------------------
@@ -196,7 +196,7 @@ return [
     'classes_content_wrapper' => '',
     'classes_content_header' => '',
     'classes_content' => '',
-    'classes_sidebar' => 'sidebar-dark-primary elevation-4',
+    'classes_sidebar' => 'elevation-4',
     'classes_sidebar_nav' => '',
     'classes_topnav' => 'navbar-white navbar-light',
     'classes_topnav_nav' => 'navbar-expand',
@@ -311,10 +311,6 @@ return [
         ],
 
         // Sidebar items:
-        [
-            'type' => 'sidebar-menu-search',
-            'text' => 'search',
-        ],
         
         // Panel de Control
         [
@@ -356,48 +352,6 @@ return [
             ],
         ],
 
-        // Area Proveedor
-        [
-            'text' => 'Área Proveedores',
-            'icon' => 'fas fa-fw fa-building',
-            'submenu' => [
-                [
-                    'text' => 'Gestión de Proveedores',
-                    'url' => 'proveedores',
-                    'icon' => 'fas fa-fw fa-briefcase',
-                    'active' => ['proveedores*'],
-                ],
-                [
-                    'text' => 'Albaranes Proveedor',
-                    'url' => 'albaranes-proveedores',
-                    'icon' => 'fas fa-fw fa-file-invoice',
-                    'active' => ['albaranes-proveedores*'],
-                ],
-                [
-                    'text' => 'Pedidos',
-                    'url' => 'pedidos',
-                    'icon' => 'fas fa-fw fa-dolly',
-                    'active' => ['pedidos*'],
-                ],
-            ],
-        ],
-
-        // Productos
-        [
-            'text' => 'Productos',
-            'url' => 'productos',
-            'icon' => 'fas fa-fw fa-boxes',
-            'active' => ['productos*'],
-        ],
-
-        // Histórico
-        [
-            'text' => 'Histórico',
-            'url' => 'historico',
-            'icon' => 'fas fa-fw fa-history',
-            'active' => ['historico*'],
-        ],
-
         // Inventario
         [
             'text' => 'Inventario',
@@ -406,17 +360,24 @@ return [
             'active' => ['inventario*'],
         ],
 
-        // Configuración
-        ['header' => 'Configuración'],
+        // Espacio en blanco para separar
+        ['header' => 'Herramientas'],
+
+        // Configuración - Al fondo
         [
             'text' => 'Perfil',
             'url' => 'profile',
             'icon' => 'fas fa-fw fa-user',
+            'active' => ['profile*'],
         ],
+
+        // Panel de Usuarios - Solo para admin/superadmin
         [
-            'text' => 'Cambiar Contraseña',
-            'url' => 'change-password',
-            'icon' => 'fas fa-fw fa-lock',
+            'text' => 'Panel de Usuarios',
+            'url' => 'users',
+            'icon' => 'fas fa-fw fa-users-cog',
+            'active' => ['users*'],
+            'can' => 'manage-users',
         ],
     ],
 

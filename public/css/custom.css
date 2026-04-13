@@ -1,8 +1,153 @@
 /* Custom AdminLTE Styles para mejorar visualización de submenús */
 
+/* === PERSONALIZACIÓN DEL SIDEBAR === */
+
+/* Altura total del viewport */
+html, body {
+    height: 100%;
+}
+
+/* Fondo del sidebar - Color oscuro personalizado */
+.main-sidebar {
+    background-color: #1A3A5A !important;
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+/* Hacer que el brand-link sea un elemento flexible */
+.sidebar .brand-link {
+    flex-shrink: 0;
+    z-index: 999;
+}
+
+/* Hacer que el contenedor del sidebar sea flexible */
+.main-sidebar .sidebar {
+    display: flex !important;
+    flex-direction: column !important;
+    flex: 1 !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+}
+
+/* Hacer que el nav sea flexible */
+.main-sidebar .sidebar > nav {
+    display: flex !important;
+    flex-direction: column !important;
+    flex: 1 !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+}
+
+/* Hacer que la lista de navegación sea flexible */
+.main-sidebar .sidebar > nav > ul.nav {
+    display: flex !important;
+    flex-direction: column !important;
+    flex: 1 !important;
+    overflow-y: auto !important;
+    min-height: 0 !important;
+    padding-top: 0.5rem !important;
+}
+
+/* Empujar los headers al final */
+.main-sidebar .sidebar > nav > ul.nav > li.nav-header {
+    margin-top: auto !important;
+}
+
+.brand-link {
+    background-color: #1A3A5A !important;
+    color: #FFFFFF !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 0.875rem 0.5rem !important;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 0.5rem;
+    position: relative;
+    z-index: 1000;
+}
+
+.brand-link:hover {
+    background-color: #0f2440 !important;
+}
+
+.brand-text {
+    color: #FFFFFF !important;
+    font-weight: 600 !important;
+}
+
+.brand-text b {
+    color: #2563EB !important;
+}
+
+/* Logo container y SVG */
+.brand-logo-container {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background-color: #2563EB;
+    border-radius: 6px;
+    margin-right: 0.75rem;
+    flex-shrink: 0;
+    vertical-align: middle;
+}
+
+.brand-logo-svg {
+    width: 18px;
+    height: 18px;
+    color: #FFFFFF;
+    stroke: currentColor;
+    fill: none;
+}
+
+/* Estilos para el menú principal */
+.sidebar .nav {
+    background-color: #1A3A5A;
+}
+
+/* Items del menú principal */
+.sidebar .nav-item > .nav-link {
+    color: #FFFFFF !important;
+    background-color: transparent;
+    transition: all 0.3s ease;
+}
+
+.sidebar .nav-item > .nav-link i {
+    color: #FFFFFF !important;
+}
+
+/* Hover en items principales */
+.sidebar .nav-item > .nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+    color: #FFFFFF !important;
+}
+
+/* Item activo del menú principal */
+.sidebar .nav-item > .nav-link.active {
+    background-color: #2563EB !important;
+    color: #FFFFFF !important;
+    border-radius: 0 10px 10px 0;
+}
+
+.sidebar .nav-item > .nav-link.active i {
+    color: #FFFFFF !important;
+}
+
+/* Padre de submenú cuando está abierto */
+.sidebar .nav-item.menu-open > .nav-link {
+    background-color: #2563EB !important;
+    color: #FFFFFF !important;
+    border-radius: 0 10px 10px 0;
+}
+
+.sidebar .nav-item.menu-open > .nav-link i {
+    color: #FFFFFF !important;
+}
+
 /* Estilos para items del submenú */
 .nav-treeview {
-    /* Las filas del submenú con fondo ligeramente diferente */
+    background-color: rgba(0, 0, 0, 0.2);
 }
 
 .nav-treeview > .nav-item > .nav-link {
@@ -11,29 +156,39 @@
     padding-left: 2rem; /* Mayor indentación a la izquierda para desplazamiento */
     padding-right: 1rem;
     font-weight: 400;
-    color: rgba(255, 255, 255, 0.8);
+    color: #FFFFFF;
     border-left: 3px solid transparent;
     transition: all 0.3s ease;
 }
 
+.nav-treeview > .nav-item > .nav-link i {
+    color: #FFFFFF !important;
+}
+
 .nav-treeview > .nav-item > .nav-link:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-    border-left-color: rgba(255, 255, 255, 0.4);
-    color: #fff;
+    background-color: rgba(37, 99, 235, 0.3);
+    border-left-color: #2563EB;
+    color: #FFFFFF;
 }
 
 /* Cuando el item del submenú está activo */
 .nav-treeview > .nav-item > .nav-link.active {
-    background-color: rgba(255, 255, 255, 0.15);
-    border-left-color: #fff;
-    color: #fff;
+    background-color: #2563EB;
+    border-left-color: #FFFFFF;
+    color: #FFFFFF;
     font-weight: 500;
+    border-radius: 5px 10px 10px 5px;
+}
+
+.nav-treeview > .nav-item > .nav-link.active i {
+    color: #FFFFFF !important;
 }
 
 /* Icono del submenú más pequeño */
 .nav-treeview .nav-icon {
     font-size: 0.75rem;
     margin-right: 0.5rem;
+    color: #FFFFFF !important;
 }
 
 /* Items principales del menú - para contraste */
@@ -41,22 +196,20 @@
     font-size: 1rem;
     font-weight: 500;
     padding-left: 1.5rem;
+    color: #FFFFFF;
 }
 
 .sidebar-menu > .nav-item > .nav-link:hover {
     background-color: rgba(255, 255, 255, 0.1);
-}
-
-/* Padre de submenú cuando está abierto */
-.sidebar-menu > .nav-item.menu-open > .nav-link {
-    background-color: rgba(0, 0, 0, 0.1);
-    font-weight: 600;
+    color: #FFFFFF;
 }
 
 /* Asegurar que el submenú padre esté destacado */
 .sidebar-menu > .nav-item > .nav-link.active {
-    background-color: rgba(255, 255, 255, 0.15);
+    background-color: #2563EB;
+    color: #FFFFFF;
     font-weight: 600;
+    border-radius: 0 10px 10px 0;
 }
 
 /* Efecto visual de separación entre padres e hijos */
@@ -74,6 +227,7 @@
     position: absolute;
     right: 1rem;
     font-size: 0.875rem;
+    color: #FFFFFF;
 }
 
 /* Animación suave del chevron cuando se abre el submenú */
@@ -85,4 +239,85 @@
 /* Línea divisoria visual opcional para mayor distinción */
 .sidebar-menu > .nav-item.menu-open {
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* === ESTILOS ADICIONALES PARA REFINAMIENTO === */
+
+/* Estilos para el nav-header (Herramientas) */
+.main-sidebar .sidebar > nav > ul.nav li.nav-header {
+    color: rgba(255, 255, 255, 0.5) !important;
+    background-color: rgba(0, 0, 0, 0.3) !important;
+    padding: 0.875rem 1rem !important;
+    font-size: 0.8rem !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    margin-top: auto !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Header personalizado */
+.content-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #e3e6f0;
+}
+
+/* Scrollbar del sidebar */
+.os-theme-light.os-host-overflow {
+    background-color: transparent;
+}
+
+.os-theme-light.os-host .os-scrollbar .os-scrollbar-track {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.os-theme-light.os-host .os-scrollbar .os-scrollbar-handle {
+    background-color: rgba(255, 255, 255, 0.3);
+}
+
+.os-theme-light.os-host .os-scrollbar .os-scrollbar-handle:hover {
+    background-color: rgba(255, 255, 255, 0.5);
+}
+
+/* Sidebar colapsado - hacer que el logo sea legible */
+.sidebar-collapse .brand-logo-container {
+    margin-right: 0;
+}
+
+.sidebar-collapse .brand-text {
+    display: none;
+}
+
+/* Estilos para headers de sección */
+.sidebar .nav-header {
+    color: rgba(255, 255, 255, 0.6) !important;
+    background-color: rgba(0, 0, 0, 0.2);
+    padding: 0.75rem 1rem !important;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: auto;
+    margin-bottom: 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Efectos visuales de transición */
+.sidebar {
+    transition: background-color 0.3s ease;
+}
+
+.sidebar .nav-item,
+.sidebar .nav-link {
+    transition: all 0.3s ease;
+}
+
+/* Header del login (para consistencia de branding) */
+.form-header h1 {
+    color: #0D1B36;
+}
+
+.form-header p {
+    color: #6B7280;
 }

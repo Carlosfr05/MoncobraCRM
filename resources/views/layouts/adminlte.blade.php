@@ -97,8 +97,12 @@
 
         <aside class="main-sidebar sidebar-dark-primary elevation-4">
             <a href="{{ route('dashboard') }}" class="brand-link">
-                <img src="https://via.placeholder.com/40" alt="Logo" class="brand-image img-circle elevation-3" style="opacity: 0.8">
-                <span class="brand-text font-weight-light">MoncobraCRM</span>
+                <div class="brand-logo-container">
+                    <svg class="brand-logo-svg" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <span class="brand-text font-weight-light">Moncobra<b>CRM</b></span>
             </a>
 
             <nav class="mt-2" data-lte-toggle="treeview" data-accordion="false">

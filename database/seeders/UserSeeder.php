@@ -19,9 +19,10 @@ class UserSeeder extends Seeder
         $proyectoCadiz = Proyecto::where('nombre', 'Cádiz')->first();
 
         // Usuario normal (user)
+
         User::create([
-            'name' => 'CarlosUser',
-            'email' => 'user@gmail.com',
+            'name' => 'AlfonsoUser',
+            'email' => 'alfonso.user@gmail.com',
             'password' => Hash::make('12345678'),
             'role' => 'user',
             'proyecto_id' => $proyectoCadiz?->id,
@@ -32,9 +33,10 @@ class UserSeeder extends Seeder
         ]);
 
         // Usuario administrador (admin)
+        
         User::create([
-            'name' => 'CarlosAdmin',
-            'email' => 'admin@gmail.com',
+            'name' => 'AlfonsoAdmin',
+            'email' => 'alfonso.admin@gmail.com',
             'password' => Hash::make('12345678'),
             'role' => 'admin',
             'proyecto_id' => null, // Los admins no tienen proyecto asignado
@@ -45,9 +47,10 @@ class UserSeeder extends Seeder
         ]);
 
         // Usuario superadmin (superadmin)
+       
         User::create([
-            'name' => 'CarlosSuperAdmin',
-            'email' => 'superadmin@gmail.com',
+            'name' => 'AlfonsoSuperAdmin',
+            'email' => 'alfonso.superadmin@gmail.com',
             'password' => Hash::make('12345678'),
             'role' => 'superadmin',
             'proyecto_id' => null, // Los superadmins no tienen proyecto asignado

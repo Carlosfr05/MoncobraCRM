@@ -13,6 +13,7 @@ use App\Http\Controllers\PedidoController;
 use App\Http\Controllers\ProductoController;
 use App\Http\Controllers\InventarioController;
 use App\Http\Controllers\HistoricoController;
+use App\Http\Controllers\UserController;
 
 // 1. CAMBIO: Nombre de ruta único para la página de bienvenida.
 // Antes se llamaba 'dashboard', ahora 'welcome'.
@@ -49,5 +50,10 @@ Route::middleware('auth')->group(function () {
     Route::resource('productos', ProductoController::class)->only(['index']);
     Route::resource('inventario', InventarioController::class);
     Route::resource('historico', HistoricoController::class)->only(['index']);
+    
+    // Gestión de Usuarios (Solo admin y superadmin)
+    Route::resource('users', UserController::class);
+    Route::post('users/{user}/change-role', [UserController::class, 'changeRole'])->name('users.changeRole');
+    Route::post('users/{user}/toggle-active', [UserController::class, 'toggleActive'])->name('users.toggleActive');
     
 });
