@@ -18,7 +18,9 @@ html, body {
 .sidebar .brand-link {
     flex-shrink: 0;
     z-index: 999;
+    max-width: 100%;
 }
+
 
 /* Hacer que el contenedor del sidebar sea flexible */
 .main-sidebar .sidebar {
@@ -57,13 +59,16 @@ html, body {
     background-color: #1A3A5A !important;
     color: #FFFFFF !important;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    padding: 0.875rem 0.5rem !important;
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    gap: 0.5rem;
+    padding: 0.5rem 0.5rem !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 0.5rem !important;
     position: relative;
     z-index: 1000;
+    width: 100% !important;
+    min-width: 0 !important;
+    flex-wrap: nowrap !important;
 }
 
 .brand-link:hover {
@@ -73,32 +78,23 @@ html, body {
 .brand-text {
     color: #FFFFFF !important;
     font-weight: 600 !important;
+    font-size: 20px !important;
+    flex: 1 !important;
+    min-width: auto !important;
 }
+
 
 .brand-text b {
     color: #2563EB !important;
 }
 
-/* Logo container y SVG */
-.brand-logo-container {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 32px;
-    height: 32px;
-    background-color: #2563EB;
-    border-radius: 6px;
-    margin-right: 0.75rem;
-    flex-shrink: 0;
-    vertical-align: middle;
-}
-
-.brand-logo-svg {
-    width: 18px;
-    height: 18px;
-    color: #FFFFFF;
-    stroke: currentColor;
-    fill: none;
+/* Logo image */
+.brand-logo-image {
+    width: 28px !important;
+    height: 28px !important;
+    object-fit: contain !important;
+    margin-right: 0.75rem !important;
+    flex-shrink: 0 !important;
 }
 
 /* Estilos para el menú principal */

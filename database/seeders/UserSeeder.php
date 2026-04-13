@@ -15,9 +15,9 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        // Obtener un proyecto para el usuario normal
+        
+        // 1. Buscamos el proyecto que se creó en el otro seeder
         $proyectoCadiz = Proyecto::where('nombre', 'Cádiz')->first();
-
         // Usuario normal (user)
 
         User::create([

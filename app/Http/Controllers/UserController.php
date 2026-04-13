@@ -69,6 +69,10 @@ class UserController extends Controller
         // Validar cambio de rol según permisos
         if ($request->input('role') !== $user->role) {
             $this->authorize('change-user-role', $user);
+            // Un admin no puede asignar 'superadmin'
+            if ($request->user()->role === 'admin' && $request->input('role') === 'superadmin') {
+                return back()->withErrors(['role' => 'No tienes permisos para asignar ese rol.']);
+            }
         }
 
         $user->update($validated);
@@ -92,8 +96,8 @@ class UserController extends Controller
             return response()->json(['error' => 'No puedes cambiar tu propio rol.'], 403);
         }
 
-        // Un admin no puede asignar 'admin' ni 'superadmin'
-        if (auth()->user()->role === 'admin' && in_array($request->input('role'), ['admin', 'superadmin'])) {
+        // Un admin no puede asignar 'superadmin'
+        if (auth()->user()->role === 'admin' && $request->input('role') === 'superadmin') {
             return response()->json(['error' => 'No tienes permisos para asignar ese rol.'], 403);
         }
 
@@ -141,9 +145,7 @@ class UserController extends Controller
      */
     public function show(User $user)
     {
-        if (auth()->user()->role === 'admin' && $user->role !== 'user') {
-            abort(403);
-        }
+        $this->authorize('view-user', $user);
 
         return view('usuarios.show', compact('user'));
     }

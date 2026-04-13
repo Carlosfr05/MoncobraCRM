@@ -2,138 +2,200 @@
 
 @section('title', 'Panel de Usuarios')
 
+@section('css')
+    {{-- Fuentes Externas --}}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    {{-- Importamos el CSS mediante Vite --}}
+    @vite(['resources/css/usuarios-panel.css'])
+@endsection
+
 @section('content_header')
     <div class="row mb-2">
         <div class="col-sm-6">
-            <h1 class="m-0">Panel de Usuarios</h1>
+            <h1 class="m-0">Listado de Personal</h1>
+            <p class="page-subtitle">Administra los accesos y roles de tu equipo de trabajo.</p>
         </div>
     </div>
 @endsection
 
 @section('content')
-    <div class="row">
-        <div class="col-12">
-            @if ($message = Session::get('success'))
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    <strong>Éxito:</strong> {{ $message }}
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-            @endif
 
-            @if ($message = Session::get('error'))
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    <strong>Error:</strong> {{ $message }}
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-            @endif
+    {{-- ── Alertas flash ── --}}
+    @if ($message = Session::get('success'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle"></i>
+            <strong>Éxito:</strong> {{ $message }}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    @endif
 
-            <div class="card card-primary card-outline">
-                <div class="card-header">
-                    <h3 class="card-title">Gestión de Usuarios del Sistema</h3>
-                </div>
+    @if ($message = Session::get('error'))
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-circle"></i>
+            <strong>Error:</strong> {{ $message }}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    @endif
 
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-hover table-striped">
-                            <thead class="table-primary">
-                                <tr>
-                                    <th>Nombre</th>
-                                    <th>Email</th>
-                                    <th>Rol</th>
-                                    <th>Proyecto</th>
-                                    <th>Teléfono</th>
-                                    <th>Estado</th>
-                                    <th width="200">Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @forelse($users as $user)
-                                    <tr>
-                                        <td>
-                                            <strong>{{ $user->name }}</strong>
-                                            @if(auth()->id() === $user->id)
-                                                <span class="badge badge-secondary ml-2">Tú</span>
-                                            @endif
-                                        </td>
-                                        <td>{{ $user->email }}</td>
-                                        <td>
-                                            @if($user->role === 'superadmin')
-                                                <span class="badge badge-danger">Super Admin</span>
-                                            @elseif($user->role === 'admin')
-                                                <span class="badge badge-warning">Admin</span>
-                                            @else
-                                                <span class="badge badge-info">Usuario</span>
-                                            @endif
-                                        </td>
-                                        <td>
-                                            @if($user->proyecto)
-                                                <small>{{ $user->proyecto->nombre }}</small>
-                                            @else
-                                                <span class="text-muted">-</span>
-                                            @endif
-                                        </td>
-                                        <td>{{ $user->telefono ?? '-' }}</td>
-                                        <td>
-                                            @if($user->activo)
-                                                <span class="badge badge-success">Activo</span>
-                                            @else
-                                                <span class="badge badge-secondary">Inactivo</span>
-                                            @endif
-                                        </td>
-                                        <td>
-                                            @if(auth()->id() !== $user->id)
-                                                @can('edit-user', $user)
-                                                    <a href="{{ route('users.edit', $user->id) }}" class="btn btn-sm btn-info" title="Editar">
-                                                        <i class="fas fa-edit"></i>
-                                                    </a>
-                                                @else
-                                                    <button class="btn btn-sm btn-secondary disabled" title="No puedes editar este usuario">
-                                                        <i class="fas fa-lock"></i>
-                                                    </button>
-                                                @endcan
-                                                
-                                                @can('edit-user', $user)
-                                                    <button class="btn btn-sm btn-warning toggle-active-btn" data-user-id="{{ $user->id }}" title="Cambiar estado">
-                                                        <i class="fas fa-power-off"></i>
-                                                    </button>
-                                                @endif
-                                                
-                                                @can('delete-user', $user)
-                                                    <form action="{{ route('users.destroy', $user->id) }}" method="POST" style="display: inline;" onsubmit="return confirm('¿Estás seguro?');">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        <button type="submit" class="btn btn-sm btn-danger" title="Eliminar">
-                                                            <i class="fas fa-trash"></i>
-                                                        </button>
-                                                    </form>
-                                                @endcan
-                                            @else
-                                                <span class="text-muted">Perfil Personal</span>
-                                            @endif
-                                        </td>
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="7" class="text-center text-muted py-4">
-                                            No hay usuarios disponibles.
-                                        </td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
-                    </div>
-
-                    @if($users->hasPages())
-                        <div class="mt-3">
-                            {{ $users->links() }}
-                        </div>
-                    @endif
-                </div>
+    {{-- ── Stats ── --}}
+    <div class="stats-row">
+        <div class="stat-card">
+            <div class="stat-icon blue"><i class="fas fa-users"></i></div>
+            <div>
+                <div class="stat-label">Total Usuarios</div>
+                <div class="stat-value">{{ $users->total() }}</div>
             </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon green"><i class="fas fa-shield-halved"></i></div>
+            <div>
+                <div class="stat-label">Activos</div>
+                <div class="stat-value">{{ $users->getCollection()->where('activo', true)->count() }}</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon orange"><i class="fas fa-user-shield"></i></div>
+            <div>
+                <div class="stat-label">Administrativos</div>
+                <div class="stat-value">{{ $users->getCollection()->whereIn('role', ['admin','superadmin'])->count() }}</div>
+            </div>
+        </div>
+    </div>
+
+    {{-- ── Tabla principal ── --}}
+    <div class="card-main">
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Email</th>
+                        <th>Rol</th>
+                        <th>Proyecto</th>
+                        <th>Teléfono</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($users as $user)
+                        <tr>
+                            <td>
+                                <a href="{{ route('users.show', $user->id) }}">
+                                    <strong>{{ $user->name }}</strong>
+                                </a>
+                                @if(auth()->id() === $user->id)
+                                    <span class="badge badge-secondary ml-2">Tú</span>
+                                @endif
+                            </td>
+                            <td class="td-email">{{ $user->email }}</td>
+                            <td>
+                                @if($user->role === 'superadmin')
+                                    <span class="badge badge-danger">Super Admin</span>
+                                @elseif($user->role === 'admin')
+                                    <span class="badge badge-warning">Admin</span>
+                                @else
+                                    <span class="badge badge-info">Usuario</span>
+                                @endif
+                            </td>
+                            <td>
+                                @if($user->proyecto)
+                                    <small>{{ $user->proyecto->nombre }}</small>
+                                @else
+                                    <span style="color:#d1d5db">—</span>
+                                @endif
+                            </td>
+                            <td>{{ $user->telefono ?? '—' }}</td>
+                            <td>
+                                @if($user->activo)
+                                    <span class="badge badge-success">Activo</span>
+                                @else
+                                    <span class="badge badge-secondary">Inactivo</span>
+                                @endif
+                            </td>
+                            <td>
+                                @if(auth()->id() !== $user->id)
+                                    <div class="actions-cell">
+                                        @can('edit-user', $user)
+                                            <a href="{{ route('users.edit', $user->id) }}" class="btn btn-sm btn-info" title="Editar">
+                                                <i class="fas fa-pen"></i>
+                                            </a>
+                                        @else
+                                            <button class="btn btn-sm btn-secondary disabled" title="No puedes editar este usuario" disabled>
+                                                <i class="fas fa-lock"></i>
+                                            </button>
+                                        @endcan
+
+                                        @can('edit-user', $user)
+                                            <button class="btn btn-sm btn-warning toggle-active-btn" data-user-id="{{ $user->id }}" title="Cambiar estado">
+                                                <i class="fas fa-power-off"></i>
+                                            </button>
+                                        @endcan
+
+                                        @can('delete-user', $user)
+                                            <form action="{{ route('users.destroy', $user->id) }}" method="POST" onsubmit="return confirm('¿Estás seguro?');">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-sm btn-danger" title="Eliminar">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        @endcan
+
+                                        <a href="{{ route('users.show', $user->id) }}" class="btn btn-sm btn-secondary" title="Ver detalle" style="background:#f3f4f6!important;color:#6b7280!important;">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                    </div>
+                                @else
+                                    <span style="font-size:.78rem;color:var(--color-muted)">Perfil Personal</span>
+                                @endif
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="7">
+                                <div class="empty-state">
+                                    <i class="fas fa-users-slash"></i>
+                                    No hay usuarios disponibles.
+                                </div>
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+
+        @if($users->hasPages() || $users->total() > 0)
+            <div class="table-footer">
+                <span class="table-count">
+                    Mostrando {{ $users->firstItem() }}–{{ $users->lastItem() }} de {{ $users->total() }} usuarios
+                </span>
+                @if($users->hasPages())
+                    {{ $users->links() }}
+                @endif
+            </div>
+        @endif
+    </div>
+
+    <div class="bottom-row">
+        <div class="card-audit">
+            <h5>Auditoría de Seguridad</h5>
+            <p>Revisa los últimos accesos y cambios de contraseña realizados por los usuarios del sistema.</p>
+            <a href="#">Ver historial de logs <i class="fas fa-arrow-right"></i></a>
+        </div>
+
+        <div class="card-permisos">
+            <div class="card-permisos-header">
+                <div class="permisos-icon"><i class="fas fa-circle-info"></i></div>
+                <h5>Permisos por Rol</h5>
+            </div>
+            <p>Los roles de Super Admin tienen acceso total. Los Admin pueden gestionar inventario y clientes. Los Usuarios solo visualizan tareas asignadas.</p>
         </div>
     </div>
 @endsection
@@ -143,11 +205,7 @@
         document.querySelectorAll('.toggle-active-btn').forEach(button => {
             button.addEventListener('click', function() {
                 const userId = this.dataset.userId;
-                const button = this;
-
-                if (!confirm('¿Cambiar el estado de este usuario?')) {
-                    return;
-                }
+                if (!confirm('¿Cambiar el estado de este usuario?')) return;
 
                 fetch(`/users/${userId}/toggle-active`, {
                     method: 'POST',
@@ -158,10 +216,7 @@
                 })
                 .then(response => response.json())
                 .then(data => {
-                    if (data.success) {
-                        // Recargar la página
-                        window.location.reload();
-                    }
+                    if (data.success) window.location.reload();
                 })
                 .catch(error => {
                     console.error('Error:', error);

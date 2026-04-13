@@ -2,6 +2,8 @@
 
 @section('title', 'Detalles del Usuario')
 
+@vite(['resources/css/usuarios-show.css'])
+
 @section('content_header')
     <div class="row mb-2">
         <div class="col-sm-6">
@@ -17,7 +19,8 @@
 @endsection
 
 @section('content')
-    <div class="row">
+    <div class="usuarios-show-page">
+        <div class="row">
         <div class="col-md-8">
             <div class="card card-primary">
                 <div class="card-header">

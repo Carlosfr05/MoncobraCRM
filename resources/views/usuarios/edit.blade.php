@@ -84,12 +84,19 @@
                                 name="role" 
                                 required
                             >
-                                <option value="user" {{ old('role', $user->role) === 'user' ? 'selected' : '' }}>
-                                    Usuario
-                                </option>
-                                @if(auth()->user()->role === 'superadmin')
+                                @if(auth()->user()->role === 'superadmin' || auth()->user()->role === 'admin')
+                                    <option value="user" {{ old('role', $user->role) === 'user' ? 'selected' : '' }}>
+                                        Usuario
+                                    </option>
+                                @endif
+                                @if(auth()->user()->role === 'superadmin' || auth()->user()->role === 'admin')
                                     <option value="admin" {{ old('role', $user->role) === 'admin' ? 'selected' : '' }}>
                                         Admin
+                                    </option>
+                                @endif
+                                @if(auth()->user()->role === 'superadmin')
+                                    <option value="superadmin" {{ old('role', $user->role) === 'superadmin' ? 'selected' : '' }}>
+                                        Super Admin
                                     </option>
                                 @endif
                             </select>
@@ -98,7 +105,7 @@
                             @enderror
                             <small class="form-text text-muted">
                                 @if(auth()->user()->role === 'admin')
-                                    <i class="fas fa-info-circle"></i> Como Admin, solo puedes asignar el rol de Usuario.
+                                    <i class="fas fa-info-circle"></i> Como Admin, puedes asignar los roles de Usuario y Admin, pero no puedes asignar Super Admin.
                                 @elseif(auth()->user()->role === 'superadmin')
                                     <i class="fas fa-info-circle"></i> Como Super Admin, puedes asignar cualquier rol.
                                 @endif

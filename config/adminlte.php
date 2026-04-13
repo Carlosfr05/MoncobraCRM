@@ -64,11 +64,11 @@ return [
     */
 
     'logo' => 'Moncobra<b>CRM</b>',
-    'logo_img' => null,
-    'logo_img_class' => 'brand-image img-circle elevation-3',
+    'logo_img' => 'images/logo_moncobra.png',
+    'logo_img_class' => 'brand-image img-circle',
     'logo_img_xl' => null,
     'logo_img_xl_class' => 'brand-image-xs',
-    'logo_img_alt' => 'Moncobra Logo',
+    'logo_img_alt' => 'lol',
 
     /*
     |--------------------------------------------------------------------------
@@ -332,22 +332,22 @@ return [
                     'active' => ['clientes*'],
                 ],
                 [
-                    'text' => 'Albaranes Clientes',
-                    'url' => 'albaranes',
-                    'icon' => 'fas fa-fw fa-file-alt',
-                    'active' => ['albaranes', 'albaranes/*'],
-                ],
-                [
                     'text' => 'Presupuestos',
                     'url' => 'presupuestos',
                     'icon' => 'fas fa-fw fa-file-invoice-dollar',
                     'active' => ['presupuestos*'],
                 ],
                 [
-                    'text' => 'Bolsa Clientes',
-                    'url' => 'bolsa',
+                    'text' => 'Pedidos Clientes',
+                    'url' => 'pedidos',
                     'icon' => 'fas fa-fw fa-briefcase',
-                    'active' => ['bolsa*'],
+                    'active' => ['pedidos*'],
+                ],
+                [
+                    'text' => 'Albaranes Clientes',
+                    'url' => 'albaranes',
+                    'icon' => 'fas fa-fw fa-file-alt',
+                    'active' => ['albaranes', 'albaranes/*'],
                 ],
             ],
         ],

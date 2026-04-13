@@ -20,7 +20,7 @@ class ProyectoSeeder extends Seeder
         ];
 
         foreach ($proyectos as $proyecto) {
-            Proyecto::create($proyecto);
+            Proyecto::updateOrCreate(['nombre' => $proyecto['nombre']], $proyecto);
         }
     }
 }

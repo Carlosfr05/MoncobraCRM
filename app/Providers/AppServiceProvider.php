@@ -31,24 +31,30 @@ class AppServiceProvider extends ServiceProvider
             return in_array($user->role, ['admin', 'superadmin']);
         });
 
+        // Gate para ver detalles de un usuario específico
+        Gate::define('view-user', function (User $user, User $targetUser) {
+            // Solo admin y superadmin pueden ver detalles de cualquier usuario
+            return in_array($user->role, ['admin', 'superadmin']);
+        });
+
         // Gate para editar un usuario específico
         Gate::define('edit-user', function (User $user, User $targetUser) {
-            // Un superadmin puede editar a todos
+            // Un superadmin puede editar a todos menos sí mismo
             if ($user->role === 'superadmin') {
-                return $user->id !== $targetUser->id; // No puede editarse a sí mismo
+                return $user->id !== $targetUser->id;
             }
-            // Un admin puede editar a usuarios regulares
+            // Un admin puede editar a usuarios y otros admins
             if ($user->role === 'admin') {
-                return $targetUser->role === 'user';
+                return in_array($targetUser->role, ['user', 'admin']) && $user->id !== $targetUser->id;
             }
             return false;
         });
 
         // Gate para eliminar un usuario
         Gate::define('delete-user', function (User $user, User $targetUser) {
-            // Un superadmin puede eliminar cualquiera menos otro superadmin
+            // Un superadmin puede eliminar cualquiera menos sí mismo
             if ($user->role === 'superadmin') {
-                return $targetUser->role !== 'superadmin' && $user->id !== $targetUser->id;
+                return $user->id !== $targetUser->id;
             }
             // Un admin solo puede eliminar usuarios regulares
             if ($user->role === 'admin') {
@@ -59,13 +65,13 @@ class AppServiceProvider extends ServiceProvider
 
         // Gate para cambiar el rol de un usuario
         Gate::define('change-user-role', function (User $user, User $targetUser) {
-            // Un superadmin puede cambiar roles a cualquiera menos otro superadmin
+            // Un superadmin puede cambiar roles a cualquiera menos sí mismo
             if ($user->role === 'superadmin') {
-                return $targetUser->role !== 'superadmin' || $user->id === $targetUser->id;
+                return $user->id !== $targetUser->id;
             }
-            // Un admin solo puede asignar rol 'user' a usuarios regulares
+            // Un admin puede cambiar roles de usuarios y otros admins (pero no superadmin)
             if ($user->role === 'admin') {
-                return $targetUser->role === 'user';
+                return in_array($targetUser->role, ['user', 'admin']) && $user->id !== $targetUser->id;
             }
             return false;
         });
