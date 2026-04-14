@@ -2,6 +2,8 @@
 
 @section('title', 'Editar Usuario')
 
+@vite(['resources/css/usuarios-edit.css'])
+
 @section('content_header')
     <div class="row mb-2">
         <div class="col-sm-6">
@@ -17,7 +19,8 @@
 @endsection
 
 @section('content')
-    <div class="row">
+    <div class="usuarios-edit-page">
+        <div class="row">
         <div class="col-md-8">
             <div class="card card-primary">
                 <div class="card-header">
@@ -229,5 +232,6 @@
                 </div>
             </div>
         </div>
+    </div>
     </div>
 @endsection

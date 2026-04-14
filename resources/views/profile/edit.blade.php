@@ -96,10 +96,10 @@
                     </span>
                 @endif
 
-                @if (Auth::user()->proyecto)
+                @if (Auth::user()->proyectos->isNotEmpty())
                     <span class="badge badge-project">
                         <i class="fas fa-building" style="font-size:10px"></i>
-                        {{ Auth::user()->proyecto->nombre }}
+                        {{ Auth::user()->proyectos->pluck('nombre')->join(', ') }}
                     </span>
                 @endif
 
@@ -126,7 +126,7 @@
                 <div class="info-item">
                     <div class="info-label">Proyecto / Sucursal</div>
                     <div class="info-value" style="padding: 0.5rem; color: #6B7280;">
-                        {{ Auth::user()->proyecto?->nombre ?? 'Acceso a todos los proyectos' }}
+                        {{ Auth::user()->proyectos->isNotEmpty() ? Auth::user()->proyectos->pluck('nombre')->join(', ') : 'Acceso a todos los proyectos' }}
                     </div>
                 </div>
             </div>

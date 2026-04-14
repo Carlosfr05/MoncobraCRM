@@ -51,7 +51,13 @@
                                     <span class="badge badge-secondary">Inactivo</span>
                                 @endif
                             </p>
-                            <p><strong>Proyecto:</strong> {{ $user->proyecto->nombre ?? 'No asignado' }}</p>
+                            <p><strong>Proyectos:</strong>
+                                @if($user->proyectos->isNotEmpty())
+                                    {{ $user->proyectos->pluck('nombre')->join(', ') }}
+                                @else
+                                    No asignado
+                                @endif
+                            </p>
                         </div>
                     </div>
 

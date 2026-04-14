@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use App\Models\Proyecto;
 use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -15,49 +14,53 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        
-        // 1. Buscamos el proyecto que se creó en el otro seeder
-        $proyectoCadiz = Proyecto::where('nombre', 'Cádiz')->first();
-        // Usuario normal (user)
+        $proyectos = Proyecto::query()->pluck('id', 'nombre');
 
-        User::create([
-            'name' => 'AlfonsoUser',
+        // Usuario normal (1 proyecto)
+        $usuario = User::updateOrCreate([
             'email' => 'alfonso.user@gmail.com',
+        ], [
+            'name' => 'AlfonsoUser',
             'password' => Hash::make('12345678'),
             'role' => 'user',
-            'proyecto_id' => $proyectoCadiz?->id,
             'descripcion' => 'Usuario operativo de la sucursal Cádiz',
             'telefono' => '633117324',
             'avatar' => null,
             'activo' => true,
         ]);
+        $usuario->proyectos()->sync(array_filter([
+            $proyectos->get('Cádiz'),
+        ]));
 
-        // Usuario administrador (admin)
-        
-        User::create([
-            'name' => 'AlfonsoAdmin',
+        // Usuario administrador (2 proyectos)
+        $admin = User::updateOrCreate([
             'email' => 'alfonso.admin@gmail.com',
+        ], [
+            'name' => 'AlfonsoAdmin',
             'password' => Hash::make('12345678'),
             'role' => 'admin',
-            'proyecto_id' => null, // Los admins no tienen proyecto asignado
             'descripcion' => 'Administradora del sistema',
             'telefono' => '633117324',
             'avatar' => null,
             'activo' => true,
         ]);
+        $admin->proyectos()->sync(array_filter([
+            $proyectos->get('Cádiz'),
+            $proyectos->get('Madrid'),
+        ]));
 
-        // Usuario superadmin (superadmin)
-       
-        User::create([
-            'name' => 'AlfonsoSuperAdmin',
+        // Usuario superadmin (todos los proyectos)
+        $superadmin = User::updateOrCreate([
             'email' => 'alfonso.superadmin@gmail.com',
+        ], [
+            'name' => 'AlfonsoSuperAdmin',
             'password' => Hash::make('12345678'),
             'role' => 'superadmin',
-            'proyecto_id' => null, // Los superadmins no tienen proyecto asignado
             'descripcion' => 'Superadministrador con acceso total',
             'telefono' => '633117324',
             'avatar' => null,
             'activo' => true,
         ]);
+        $superadmin->proyectos()->sync($proyectos->values()->all());
     }
 }

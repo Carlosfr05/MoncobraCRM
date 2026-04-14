@@ -17,6 +17,12 @@
             <h1 class="m-0">Listado de Personal</h1>
             <p class="page-subtitle">Administra los accesos y roles de tu equipo de trabajo.</p>
         </div>
+        <div class="col-sm-6 header-actions">
+            <a href="{{ route('users.create') }}" class="btn-create-user">
+                <i class="fas fa-user-plus"></i>
+                Crear Usuario
+            </a>
+        </div>
     </div>
 @endsection
 
@@ -77,7 +83,7 @@
                         <th>Nombre</th>
                         <th>Email</th>
                         <th>Rol</th>
-                        <th>Proyecto</th>
+                        <th>Proyectos</th>
                         <th>Teléfono</th>
                         <th>Estado</th>
                         <th>Acciones</th>
@@ -105,10 +111,10 @@
                                 @endif
                             </td>
                             <td>
-                                @if($user->proyecto)
-                                    <small>{{ $user->proyecto->nombre }}</small>
+                                @if($user->proyectos->isNotEmpty())
+                                    <small>{{ $user->proyectos->pluck('nombre')->join(', ') }}</small>
                                 @else
-                                    <span style="color:#d1d5db">—</span>
+                                    <span style="color:#d1d5db">Acceso a todos los proyectos</span>
                                 @endif
                             </td>
                             <td>{{ $user->telefono ?? '—' }}</td>

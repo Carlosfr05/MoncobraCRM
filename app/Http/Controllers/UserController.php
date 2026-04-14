@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Proyecto;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -30,9 +31,59 @@ class UserController extends Controller
         $currentUser = auth()->user();
         
         // Admin y Superadmin ven a TODOS los usuarios
-        $users = User::paginate(15);
+        $users = User::with('proyectos')->paginate(15);
 
         return view('usuarios.index', compact('users', 'currentUser'));
+    }
+
+    /**
+     * Mostrar formulario de creacion
+     */
+    public function create()
+    {
+        $proyectos = Proyecto::orderBy('nombre')->get();
+
+        return view('usuarios.create', compact('proyectos'));
+    }
+
+    /**
+     * Guardar nuevo usuario
+     */
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|string|min:8|confirmed',
+            'role' => 'required|in:user,admin,superadmin',
+            'proyecto_ids' => 'nullable|array',
+            'proyecto_ids.*' => 'exists:proyectos,id',
+            'telefono' => 'nullable|string|max:20',
+            'descripcion' => 'nullable|string|max:500',
+            'activo' => 'nullable|boolean',
+        ]);
+
+        if ($request->user()->role === 'admin' && $request->input('role') === 'superadmin') {
+            return back()->withErrors(['role' => 'No tienes permisos para asignar ese rol.'])->withInput();
+        }
+
+        if ($request->input('role') === 'user' && empty($validated['proyecto_ids'])) {
+            return back()->withErrors(['proyecto_ids' => 'Los usuarios con rol Usuario deben tener al menos un proyecto asignado.'])->withInput();
+        }
+
+        $user = User::create([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'password' => Hash::make($validated['password']),
+            'role' => $validated['role'],
+            'telefono' => $validated['telefono'] ?? null,
+            'descripcion' => $validated['descripcion'] ?? null,
+            'activo' => $request->boolean('activo', true),
+        ]);
+
+        $user->proyectos()->sync($validated['proyecto_ids'] ?? []);
+
+        return redirect()->route('users.index')->with('success', 'Usuario creado correctamente.');
     }
 
     /**
@@ -146,6 +197,8 @@ class UserController extends Controller
     public function show(User $user)
     {
         $this->authorize('view-user', $user);
+
+        $user->load('proyectos');
 
         return view('usuarios.show', compact('user'));
     }

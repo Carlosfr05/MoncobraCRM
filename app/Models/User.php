@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -23,7 +24,6 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
-        'proyecto_id',
         'descripcion',
         'telefono',
         'avatar',
@@ -57,10 +57,18 @@ class User extends Authenticatable
     }
 
     /**
-     * Get the proyecto that the user belongs to.
+     * Get the proyectos assigned to the user.
      */
-    public function proyecto()
+    public function proyectos(): BelongsToMany
     {
-        return $this->belongsTo(Proyecto::class, 'proyecto_id');
+        return $this->belongsToMany(Proyecto::class, 'proyecto_user')->withTimestamps();
+    }
+
+    /**
+     * Backward-compatible accessor for the primary proyecto.
+     */
+    public function getProyectoAttribute(): ?Proyecto
+    {
+        return $this->proyectos->first();
     }
 }

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Proyecto extends Model
 {
@@ -22,8 +23,8 @@ class Proyecto extends Model
     /**
      * Get the users that belong to the proyecto.
      */
-    public function usuarios()
+    public function usuarios(): BelongsToMany
     {
-        return $this->hasMany(User::class, 'proyecto_id');
+        return $this->belongsToMany(User::class, 'proyecto_user')->withTimestamps();
     }
 }

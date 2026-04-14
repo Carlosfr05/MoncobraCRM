@@ -154,7 +154,7 @@ return [
 
     'layout_topnav' => null,
     'layout_boxed' => null,
-    'layout_fixed_sidebar' => null,
+    'layout_fixed_sidebar' => true,
     'layout_fixed_navbar' => null,
     'layout_fixed_footer' => null,
     'layout_dark_mode' => null,
@@ -360,8 +360,12 @@ return [
             'active' => ['inventario*'],
         ],
 
-        // Espacio en blanco para separar
-        ['header' => 'Herramientas'],
+        // Sección inferior fija de utilidades
+        [
+            'header' => 'Herramientas',
+            'class' => 'sidebar-tools-header sidebar-tools-start',
+            'classes' => 'sidebar-tools-header sidebar-tools-start',
+        ],
 
         // Configuración - Al fondo
         [
@@ -369,6 +373,7 @@ return [
             'url' => 'profile',
             'icon' => 'fas fa-fw fa-user',
             'active' => ['profile*'],
+            'classes' => 'sidebar-tools-item',
         ],
 
         // Panel de Usuarios - Solo para admin/superadmin
@@ -378,6 +383,7 @@ return [
             'icon' => 'fas fa-fw fa-users-cog',
             'active' => ['users*'],
             'can' => 'manage-users',
+            'classes' => 'sidebar-tools-item',
         ],
     ],
 

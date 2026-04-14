@@ -1,0 +1,254 @@
+/* Estilos dedicados para la vista de edicion de usuarios */
+
+:root {
+  --bg-page:             #f0f2f7;
+  --bg-card:             #ffffff;
+  --color-primary:       #2563eb;
+  --color-primary-light: #eff4ff;
+  --color-success:       #16a34a;
+  --color-success-light: #f0fdf4;
+  --color-danger:        #dc2626;
+  --color-warning:       #d97706;
+  --color-info:          #0891b2;
+  --color-muted:         #6b7280;
+  --color-label:         #374151;
+  --color-border:        #e5e8ef;
+  --shadow-card:         0 1px 3px rgba(0,0,0,.07), 0 4px 16px rgba(0,0,0,.06);
+  --radius-card:         14px;
+  --radius-badge:        20px;
+  --radius-btn:          8px;
+  --font-main:           'DM Sans', 'Segoe UI', sans-serif;
+  --font-mono:           'DM Mono', monospace;
+}
+
+body,
+.wrapper,
+.content-wrapper {
+  background-color: var(--bg-page) !important;
+}
+
+.usuarios-edit-page {
+  font-family: var(--font-main) !important;
+  color: var(--color-label) !important;
+}
+
+.usuarios-edit-page .card {
+  background: var(--bg-card) !important;
+  border: 1px solid var(--color-border) !important;
+  border-radius: var(--radius-card) !important;
+  box-shadow: var(--shadow-card) !important;
+  margin-bottom: 20px !important;
+  animation: fadeSlideUp .35s ease both !important;
+}
+
+.usuarios-edit-page .col-md-4 .card {
+  animation-delay: .08s !important;
+}
+
+.usuarios-edit-page .card.card-primary {
+  border-left: 4px solid var(--color-primary) !important;
+}
+
+.usuarios-edit-page .card-header,
+.usuarios-edit-page .card.card-primary > .card-header {
+  background: var(--bg-card) !important;
+  border-bottom: 1px solid var(--color-border) !important;
+  border-radius: var(--radius-card) var(--radius-card) 0 0 !important;
+  padding: 18px 22px !important;
+}
+
+.usuarios-edit-page .card-header .card-title {
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+  color: #111827 !important;
+  margin: 0 !important;
+}
+
+.usuarios-edit-page .card-body {
+  padding: 22px !important;
+}
+
+.usuarios-edit-page .card-footer {
+  background: #fafbfc !important;
+  border-top: 1px solid var(--color-border) !important;
+  border-radius: 0 0 var(--radius-card) var(--radius-card) !important;
+  padding: 14px 22px !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+.usuarios-edit-page .form-group label {
+  font-size: .72rem !important;
+  font-weight: 600 !important;
+  text-transform: uppercase !important;
+  letter-spacing: .5px !important;
+  color: var(--color-muted) !important;
+  margin-bottom: 8px !important;
+}
+
+.usuarios-edit-page .form-control,
+.usuarios-edit-page .custom-select,
+.usuarios-edit-page textarea.form-control {
+  border: 1px solid var(--color-border) !important;
+  border-radius: 10px !important;
+  box-shadow: none !important;
+  color: var(--color-label) !important;
+  font-size: .9rem !important;
+  padding: 10px 12px !important;
+  transition: border-color .15s ease, box-shadow .15s ease !important;
+}
+
+.usuarios-edit-page textarea.form-control {
+  min-height: 98px !important;
+}
+
+.usuarios-edit-page .form-control:focus,
+.usuarios-edit-page .custom-select:focus {
+  border-color: #bfdbfe !important;
+  box-shadow: 0 0 0 3px rgba(37,99,235,.16) !important;
+}
+
+.usuarios-edit-page .invalid-feedback {
+  font-size: .78rem !important;
+}
+
+.usuarios-edit-page .form-text.text-muted {
+  font-size: .78rem !important;
+  color: var(--color-muted) !important;
+  line-height: 1.55 !important;
+  margin-top: 7px !important;
+}
+
+.usuarios-edit-page .custom-control {
+  padding-left: 2.1rem !important;
+}
+
+.usuarios-edit-page .custom-control-label {
+  font-size: .86rem !important;
+  color: var(--color-label) !important;
+  padding-top: 1px !important;
+}
+
+.usuarios-edit-page .custom-control-input:checked ~ .custom-control-label::before {
+  border-color: var(--color-primary) !important;
+  background-color: var(--color-primary) !important;
+}
+
+.usuarios-edit-page .custom-control-label::before {
+  border-radius: 999px !important;
+}
+
+.usuarios-edit-page .alert {
+  border: none !important;
+  border-radius: 10px !important;
+  font-size: .86rem !important;
+  padding: 13px 16px !important;
+}
+
+.usuarios-edit-page .alert-danger {
+  background: #fef2f2 !important;
+  color: var(--color-danger) !important;
+}
+
+.usuarios-edit-page .alert-warning {
+  background: #fffbeb !important;
+  color: var(--color-warning) !important;
+}
+
+.usuarios-edit-page .alert-info {
+  background: var(--color-primary-light) !important;
+  color: var(--color-primary) !important;
+}
+
+.usuarios-edit-page .alert ul {
+  margin-top: 8px !important;
+  margin-bottom: 0 !important;
+  padding-left: 20px !important;
+}
+
+.usuarios-edit-page .alert li {
+  margin-bottom: 3px !important;
+}
+
+.usuarios-edit-page .badge {
+  font-size: .72rem !important;
+  font-weight: 600 !important;
+  letter-spacing: .3px !important;
+  border-radius: var(--radius-badge) !important;
+  padding: 4px 10px !important;
+  border: none !important;
+}
+
+.usuarios-edit-page .btn {
+  font-family: var(--font-main) !important;
+  font-size: .84rem !important;
+  font-weight: 500 !important;
+  border-radius: var(--radius-btn) !important;
+  padding: 8px 18px !important;
+  border: none !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 7px !important;
+  transition: all .2s ease !important;
+}
+
+.usuarios-edit-page .btn-secondary {
+  background: #f3f4f6 !important;
+  color: #374151 !important;
+  border: 1px solid var(--color-border) !important;
+}
+
+.usuarios-edit-page .btn-secondary:hover {
+  background: #e5e7eb !important;
+  color: #111827 !important;
+}
+
+.usuarios-edit-page .btn-primary {
+  background: var(--color-primary) !important;
+  color: #fff !important;
+  box-shadow: 0 2px 8px rgba(37,99,235,.25) !important;
+}
+
+.usuarios-edit-page .btn-primary:hover {
+  background: #1d4ed8 !important;
+  color: #fff !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 12px rgba(37,99,235,.3) !important;
+}
+
+.usuarios-edit-page .float-right {
+  margin-left: auto !important;
+}
+
+.usuarios-edit-page p,
+.usuarios-edit-page li {
+  color: var(--color-label) !important;
+  font-size: .86rem !important;
+}
+
+.usuarios-edit-page p strong {
+  color: #111827 !important;
+}
+
+@keyframes fadeSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 767px) {
+  .usuarios-edit-page .card-body,
+  .usuarios-edit-page .card-header,
+  .usuarios-edit-page .card-footer {
+    padding: 16px !important;
+  }
+
+  .usuarios-edit-page .btn {
+    padding: 8px 14px !important;
+  }
+}

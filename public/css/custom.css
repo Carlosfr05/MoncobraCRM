@@ -7,6 +7,54 @@ html, body {
     height: 100%;
 }
 
+/* Con layout fijo, el scroll debe ocurrir en el panel de contenido derecho */
+body.layout-fixed {
+    overflow: hidden;
+}
+
+body.layout-fixed .wrapper {
+    height: 100vh;
+    overflow: hidden;
+}
+
+body.layout-fixed .content-wrapper {
+    height: calc(100vh - 57px);
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+body.layout-fixed .main-sidebar {
+    height: 100vh;
+    min-height: 100vh;
+}
+
+body.layout-fixed .main-sidebar .sidebar {
+    height: calc(100vh - 57px);
+}
+
+body.layout-fixed .main-sidebar .sidebar > nav {
+    height: 100%;
+}
+
+.main-sidebar .sidebar-main-menu {
+    min-height: 0;
+    overflow-y: auto !important;
+}
+
+.main-sidebar .sidebar-tools-menu {
+    margin-top: auto;
+    flex: 0 0 auto;
+    padding-top: 0.5rem;
+    border-top: 0;
+}
+
+body.layout-fixed .main-sidebar .os-host,
+body.layout-fixed .main-sidebar .os-padding,
+body.layout-fixed .main-sidebar .os-viewport,
+body.layout-fixed .main-sidebar .os-content {
+    height: 100% !important;
+}
+
 /* Fondo del sidebar - Color oscuro personalizado */
 .main-sidebar {
     background-color: #1A3A5A !important;
@@ -32,7 +80,8 @@ html, body {
 }
 
 /* Hacer que el nav sea flexible */
-.main-sidebar .sidebar > nav {
+.main-sidebar .sidebar > nav,
+.main-sidebar .os-content > nav {
     display: flex !important;
     flex-direction: column !important;
     flex: 1 !important;
@@ -41,17 +90,22 @@ html, body {
 }
 
 /* Hacer que la lista de navegación sea flexible */
-.main-sidebar .sidebar > nav > ul.nav {
+.main-sidebar .sidebar > nav > ul.nav,
+.main-sidebar .os-content > nav > ul.nav,
+.main-sidebar .nav-sidebar {
     display: flex !important;
     flex-direction: column !important;
     flex: 1 !important;
     overflow-y: auto !important;
     min-height: 0 !important;
+    height: 100% !important;
     padding-top: 0.5rem !important;
 }
 
-/* Empujar los headers al final */
-.main-sidebar .sidebar > nav > ul.nav > li.nav-header {
+/* Empujar solo la sección Herramientas al final */
+.main-sidebar .sidebar > nav > ul.nav > li.sidebar-tools-start,
+.main-sidebar .os-content > nav > ul.nav > li.sidebar-tools-start,
+.main-sidebar .nav-sidebar > li.sidebar-tools-start {
     margin-top: auto !important;
 }
 
@@ -248,9 +302,13 @@ html, body {
     font-weight: 600 !important;
     text-transform: uppercase !important;
     letter-spacing: 0.5px !important;
-    margin-top: auto !important;
+    margin-top: 0 !important;
     border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.main-sidebar .sidebar > nav > ul.nav li.sidebar-tools-header {
+    margin-top: auto !important;
 }
 
 /* Header personalizado */
@@ -293,7 +351,7 @@ html, body {
     font-size: 0.85rem;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    margin-top: auto;
+    margin-top: 0;
     margin-bottom: 0;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);

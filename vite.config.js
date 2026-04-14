@@ -12,6 +12,8 @@ export default defineConfig({
                 'resources/css/reset-password.css',
                 'resources/css/show_profile.css',
                 'resources/css/usuarios-panel.css',
+                'resources/css/usuarios-edit.css',
+                'resources/css/usuarios-create.css',
             ],
             refresh: true,
         }),
