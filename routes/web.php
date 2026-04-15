@@ -30,6 +30,7 @@ Route::middleware('auth')->group(function () {
     // 2. Dashboard Real
     // Esta es la ruta a la que apunta el RouteServiceProvider que cambiamos antes.
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::post('/dashboard/panel-order', [DashboardController::class, 'updatePanelOrder'])->name('dashboard.panel-order.update');
     
     // Profile
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');

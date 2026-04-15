@@ -29,6 +29,7 @@ class User extends Authenticatable
         'avatar',
         'activo',
         'ultimo_acceso',
+        'dashboard_panel_order',
     ];
 
     /**
@@ -53,6 +54,7 @@ class User extends Authenticatable
             'password' => 'hashed',
             'activo' => 'boolean',
             'ultimo_acceso' => 'datetime',
+            'dashboard_panel_order' => 'array',
         ];
     }
 

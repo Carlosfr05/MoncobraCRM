@@ -375,3 +375,331 @@ body.layout-fixed .main-sidebar .os-content {
 .form-header p {
     color: #6B7280;
 }
+
+/* === DASHBOARD PANEL STYLES === */
+
+.dashboard-page-title h1 {
+    color: #1f2a44;
+    font-size: 1.4rem;
+    font-weight: 700;
+}
+
+.dashboard-overview {
+    padding-bottom: 1.25rem;
+}
+
+.dashboard-alert {
+    border-radius: 10px;
+    margin-bottom: 0.9rem;
+    font-weight: 600;
+}
+
+.dashboard-intro {
+    background: linear-gradient(135deg, #f8fbff 0%, #eef3f8 100%);
+    border: 1px solid #dde5ef;
+    border-radius: 14px;
+    padding: 1.15rem 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0.85rem;
+}
+
+.dashboard-intro h2 {
+    margin: 0;
+    color: #1f2a44;
+    font-size: 1.6rem;
+    font-weight: 700;
+}
+
+.dashboard-intro p {
+    margin: 0.25rem 0 0;
+    color: #64748b;
+    font-size: 0.95rem;
+}
+
+.dashboard-status-pill {
+    align-self: flex-start;
+    background-color: #f2f7ff;
+    border: 1px solid #d4e4ff;
+    border-radius: 999px;
+    color: #24548f;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    padding: 0.4rem 0.75rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+}
+
+.dashboard-status-pill .status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #13b357;
+    box-shadow: 0 0 0 4px rgba(19, 179, 87, 0.2);
+}
+
+.dashboard-shortcuts {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.dashboard-shortcuts a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #32445d;
+    text-decoration: none;
+    padding: 0.35rem 0.65rem;
+    border-radius: 8px;
+    background: #f5f8fc;
+    border: 1px solid #dde4ef;
+}
+
+.dashboard-shortcuts a:hover {
+    color: #1d4f88;
+    background: #ebf3ff;
+    border-color: #c9dcfb;
+}
+
+.dashboard-shortcut-tip {
+    margin-left: auto;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #6b7a90;
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+.dashboard-card {
+    background-color: #ffffff;
+    border: 1px solid #dfe7f0;
+    border-radius: 15px;
+    box-shadow: 0 11px 28px rgba(14, 30, 56, 0.07);
+    padding: 1.05rem 1.1rem 1rem;
+    display: flex;
+    flex-direction: column;
+    min-height: 290px;
+    position: relative;
+}
+
+.dashboard-card.is-dragging {
+    opacity: 0.65;
+    border-color: #6ea7ea;
+}
+
+.dashboard-card-top {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 0.75rem;
+}
+
+.dashboard-card-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #224569;
+    background: #ebf2fb;
+}
+
+.dashboard-card-category {
+    font-size: 0.7rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: #8b9ab2;
+    font-weight: 700;
+}
+
+.dashboard-drag-handle {
+    margin-left: auto;
+    border: 0;
+    background: transparent;
+    color: #9db0c7;
+    cursor: grab;
+    padding: 0.15rem 0.35rem;
+}
+
+.dashboard-drag-handle:focus {
+    outline: 2px solid #c4dbfb;
+    border-radius: 6px;
+}
+
+.dashboard-card h3 {
+    font-size: 1.28rem;
+    color: #1c2b45;
+    font-weight: 700;
+    margin-bottom: 0.8rem;
+}
+
+.dashboard-metrics {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.7rem;
+    margin-bottom: 0.8rem;
+}
+
+.dashboard-metric-item {
+    background: #f7f9fc;
+    border: 1px solid #e6edf4;
+    border-radius: 10px;
+    padding: 0.56rem 0.66rem;
+}
+
+.dashboard-metric-label {
+    display: block;
+    font-size: 0.75rem;
+    color: #8291a7;
+    margin-bottom: 0.2rem;
+}
+
+.dashboard-metric-value {
+    font-size: 1.3rem;
+    line-height: 1.1;
+    color: #1f334f;
+}
+
+.dashboard-card-description {
+    margin: 0 0 0.95rem;
+    color: #607189;
+    font-size: 0.9rem;
+}
+
+.dashboard-card-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: auto;
+}
+
+.dashboard-card-actions .btn {
+    border-radius: 7px;
+    font-size: 0.83rem;
+    font-weight: 700;
+    padding: 0.38rem 0.88rem;
+    border: 0;
+    background-color: #1f4f82;
+}
+
+.dashboard-card-actions .btn:hover {
+    background-color: #183f67;
+}
+
+.dashboard-secondary-link {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #37597c;
+    text-decoration: none;
+}
+
+.dashboard-secondary-link:hover {
+    color: #1f4f82;
+}
+
+.dashboard-order-controls {
+    position: absolute;
+    right: 0.75rem;
+    bottom: 0.8rem;
+    display: flex;
+    gap: 0.25rem;
+}
+
+.dashboard-order-btn {
+    border: 1px solid #d7e3ef;
+    background: #f8fbff;
+    color: #5a7290;
+    width: 24px;
+    height: 24px;
+    border-radius: 7px;
+    font-size: 0.68rem;
+    line-height: 1;
+    padding: 0;
+}
+
+.dashboard-order-btn:hover {
+    background: #ebf3ff;
+    color: #2b567f;
+}
+
+.dashboard-card.tone-clientes .dashboard-card-icon {
+    background: #e6f3ff;
+    color: #2a5e90;
+}
+
+.dashboard-card.tone-presupuestos .dashboard-card-icon {
+    background: #fff4de;
+    color: #9f6a02;
+}
+
+.dashboard-card.tone-albaranes .dashboard-card-icon {
+    background: #e5f9f1;
+    color: #1b7f4f;
+}
+
+.dashboard-card.tone-inventario .dashboard-card-icon {
+    background: #ffecef;
+    color: #a2374b;
+}
+
+.dashboard-card.tone-pedidos .dashboard-card-icon {
+    background: #eef0ff;
+    color: #4a4ba7;
+}
+
+.dashboard-card.tone-documentos .dashboard-card-icon {
+    background: #f1f5fa;
+    color: #4d6079;
+}
+
+.dashboard-card.tone-bolsa .dashboard-card-icon {
+    background: #e8f7ef;
+    color: #22714e;
+}
+
+@media (max-width: 1320px) {
+    .dashboard-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 991.98px) {
+    .dashboard-intro {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .dashboard-shortcut-tip {
+        margin-left: 0;
+        width: 100%;
+    }
+
+    .dashboard-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 575.98px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .dashboard-card {
+        min-height: auto;
+    }
+}
