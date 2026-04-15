@@ -14,6 +14,7 @@ use App\Http\Controllers\ProductoController;
 use App\Http\Controllers\InventarioController;
 use App\Http\Controllers\HistoricoController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\ProyectoContextController;
 
 // 1. CAMBIO: Nombre de ruta único para la página de bienvenida.
 // Antes se llamaba 'dashboard', ahora 'welcome'.
@@ -31,6 +32,8 @@ Route::middleware('auth')->group(function () {
     // Esta es la ruta a la que apunta el RouteServiceProvider que cambiamos antes.
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::post('/dashboard/panel-order', [DashboardController::class, 'updatePanelOrder'])->name('dashboard.panel-order.update');
+    Route::get('/proyectos/{proyecto}/seleccionar', [ProyectoContextController::class, 'seleccionar'])
+        ->name('proyectos.seleccionar');
     
     // Profile
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');

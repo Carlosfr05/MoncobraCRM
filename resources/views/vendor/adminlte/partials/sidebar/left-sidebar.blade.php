@@ -8,6 +8,27 @@
     @endif
 
     @php
+        $currentUser = auth()->user();
+        $userProyectos = collect();
+        $activeProyectoId = null;
+        $activeProyectoNombre = null;
+
+        if ($currentUser) {
+            $userProyectos = $currentUser
+                ->proyectos()
+                ->orderBy('nombre')
+                ->get(['proyectos.id', 'proyectos.nombre']);
+
+            if ($userProyectos->isNotEmpty()) {
+                $sessionProyectoId = (int) session('active_proyecto_id');
+
+                $activeProyecto = $userProyectos->firstWhere('id', $sessionProyectoId) ?? $userProyectos->first();
+
+                $activeProyectoId = $activeProyecto->id;
+                $activeProyectoNombre = $activeProyecto->nombre;
+            }
+        }
+
         $sidebarMenu = array_values($adminlte->menu('sidebar'));
         $toolsStartIndex = null;
 
@@ -36,6 +57,43 @@
                 @if(!config('adminlte.sidebar_nav_accordion'))
                     data-accordion="false"
                 @endif>
+                @if($userProyectos->count() === 1)
+                    <li class="nav-item">
+                        <span class="nav-link active">
+                            <i class="nav-icon fas fa-building"></i>
+                            <p>{{ $activeProyectoNombre }}</p>
+                        </span>
+                    </li>
+                @elseif($userProyectos->count() > 1)
+                    <li class="nav-item has-treeview project-switcher-item">
+                        <a href="" class="nav-link project-switcher-link">
+                            <i class="nav-icon fas fa-building"></i>
+                            <p>
+                                {{ $activeProyectoNombre }}
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            @foreach($userProyectos as $proyecto)
+                                <li class="nav-item">
+                                    <a href="{{ route('proyectos.seleccionar', $proyecto) }}"
+                                       class="nav-link {{ (int) $activeProyectoId === (int) $proyecto->id ? 'active' : '' }}">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>{{ $proyecto->nombre }}</p>
+                                    </a>
+                                </li>
+                            @endforeach
+                        </ul>
+                    </li>
+                @else
+                    <li class="nav-item">
+                        <span class="nav-link text-warning">
+                            <i class="nav-icon fas fa-exclamation-triangle"></i>
+                            <p>Sin proyecto asignado</p>
+                        </span>
+                    </li>
+                @endif
+
                 {{-- Main sidebar links --}}
                 @each('adminlte::partials.sidebar.menu-item', $mainMenu, 'item')
             </ul>

@@ -139,9 +139,9 @@
     {{-- Custom Scripts --}}
     @yield('adminlte_js')
 
-    <!-- FIX PARA MENÚ SIN ACCORDION -->
+    <!-- FIX PARA MENÚ EN MODO ACORDEÓN -->
     <script>
-    console.log('[MenuFix] Sistema de menú sin accordion iniciado');
+    console.log('[MenuFix] Sistema de menú en modo acordeón iniciado');
     
     // Ejecutar inmediatamente
     (function() {
@@ -176,6 +176,21 @@
                     var navItem = this.closest('.nav-item');
                     if (navItem) {
                         var wasOpen = navItem.classList.contains('menu-open');
+                        var parentMenu = navItem.parentElement;
+
+                        if (!wasOpen && parentMenu) {
+                            Array.prototype.forEach.call(parentMenu.children, function(openItem) {
+                                if (
+                                    openItem !== navItem &&
+                                    openItem.classList &&
+                                    openItem.classList.contains('nav-item') &&
+                                    openItem.classList.contains('menu-open')
+                                ) {
+                                    openItem.classList.remove('menu-open');
+                                }
+                            });
+                        }
+
                         navItem.classList.toggle('menu-open');
                         console.log('[MenuFix] Toggle:', wasOpen, '→', navItem.classList.contains('menu-open'));
                     }

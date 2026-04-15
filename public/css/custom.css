@@ -39,6 +39,7 @@ body.layout-fixed .main-sidebar .sidebar > nav {
 .main-sidebar .sidebar-main-menu {
     min-height: 0;
     overflow-y: auto !important;
+    overflow-x: hidden !important;
 }
 
 .main-sidebar .sidebar-tools-menu {
@@ -46,6 +47,7 @@ body.layout-fixed .main-sidebar .sidebar > nav {
     flex: 0 0 auto;
     padding-top: 0.5rem;
     border-top: 0;
+    overflow-x: hidden !important;
 }
 
 body.layout-fixed .main-sidebar .os-host,
@@ -97,9 +99,22 @@ body.layout-fixed .main-sidebar .os-content {
     flex-direction: column !important;
     flex: 1 !important;
     overflow-y: auto !important;
+    overflow-x: hidden !important;
     min-height: 0 !important;
     height: 100% !important;
     padding-top: 0.5rem !important;
+}
+
+.main-sidebar .nav-sidebar .nav-link p {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    position: relative;
+    padding-right: 1.5rem;
+}
+
+.main-sidebar .nav-sidebar .nav-treeview {
+    overflow-x: hidden;
 }
 
 /* Empujar solo la sección Herramientas al final */
@@ -273,17 +288,33 @@ body.layout-fixed .main-sidebar .os-content {
 }
 
 /* Ícono de chevron del submenú */
-.sidebar-menu .nav-link > p > .right {
+.main-sidebar .nav-sidebar .nav-item.has-treeview > .nav-link {
+    display: flex;
+    align-items: center;
+}
+
+.main-sidebar .nav-sidebar .nav-item.has-treeview > .nav-link > p {
+    display: block;
+    flex: 1 1 auto;
+    min-width: 0;
+    margin: 0;
+    position: relative;
+    padding-right: 1.5rem;
+}
+
+.main-sidebar .nav-sidebar .nav-link > p > .right {
     position: absolute;
     right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
     font-size: 0.875rem;
     color: #FFFFFF;
+    transition: transform 0.3s ease;
 }
 
 /* Animación suave del chevron cuando se abre el submenú */
-.nav-item.menu-open > .nav-link > p > .right {
-    transform: rotate(-90deg);
-    transition: transform 0.3s ease;
+.main-sidebar .nav-sidebar .nav-item.menu-open > .nav-link > p > .right {
+    transform: translateY(-50%) rotate(-90deg);
 }
 
 /* Línea divisoria visual opcional para mayor distinción */
