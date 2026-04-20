@@ -27,6 +27,7 @@ class AlbaranCliente extends Model
         'numero',
         'fecha',
         'cliente_id',
+        'proyecto_id',
         'ot',
         'pedido_cliente',
         'titulo',
@@ -47,5 +48,13 @@ class AlbaranCliente extends Model
     public function cliente(): BelongsTo
     {
         return $this->belongsTo(Cliente::class, 'cliente_id');
+    }
+
+    /**
+     * Get the proyecto that owns the albaran.
+     */
+    public function proyecto(): BelongsTo
+    {
+        return $this->belongsTo(Proyecto::class, 'proyecto_id');
     }
 }

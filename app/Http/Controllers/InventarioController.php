@@ -14,7 +14,9 @@ class InventarioController extends Controller
 
     public function index()
     {
-        $inventarios = Inventario::paginate(15);
+        $proyectoId = $this->resolveActiveProyectoId(request());
+        $inventarios = Inventario::where('proyecto_id', $proyectoId)->paginate(15);
+
         return view('inventario.index', compact('inventarios'));
     }
 
@@ -25,36 +27,80 @@ class InventarioController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        $proyectoId = $this->resolveActiveProyectoId($request);
+
+        $validated = $request->validate([
             'codigo' => 'required|unique:inventario,codigo',
             'descripcion' => 'required|string',
+            'referencia_proveedor' => 'nullable|string|max:255',
+            'clase' => 'nullable|string|max:255',
+            'ubicacion' => 'nullable|string|max:255',
+            'almacen' => 'nullable|string|max:255',
             'stock_actual' => 'required|integer|min:0',
             'stock_minimo' => 'nullable|integer|min:0',
             'nivel_critico' => 'nullable|integer|min:0',
         ]);
 
-        Inventario::create($request->all());
+        $validated['proyecto_id'] = $proyectoId;
+
+        Inventario::create($validated);
         return redirect()->route('inventario.index')->with('success', 'Producto creado');
     }
 
     public function show(Inventario $inventario)
     {
+        $proyectoId = $this->resolveActiveProyectoId(request());
+
+        if ((int) $inventario->proyecto_id !== $proyectoId) {
+            abort(404);
+        }
+
         return view('inventario.show', compact('inventario'));
     }
 
     public function edit(Inventario $inventario)
     {
+        $proyectoId = $this->resolveActiveProyectoId(request());
+
+        if ((int) $inventario->proyecto_id !== $proyectoId) {
+            abort(404);
+        }
+
         return view('inventario.edit', compact('inventario'));
     }
 
     public function update(Request $request, Inventario $inventario)
     {
-        $inventario->update($request->all());
+        $proyectoId = $this->resolveActiveProyectoId($request);
+
+        if ((int) $inventario->proyecto_id !== $proyectoId) {
+            abort(404);
+        }
+
+        $validated = $request->validate([
+            'codigo' => 'required|unique:inventario,codigo,' . $inventario->id,
+            'descripcion' => 'required|string',
+            'referencia_proveedor' => 'nullable|string|max:255',
+            'clase' => 'nullable|string|max:255',
+            'ubicacion' => 'nullable|string|max:255',
+            'almacen' => 'nullable|string|max:255',
+            'stock_actual' => 'required|integer|min:0',
+            'stock_minimo' => 'nullable|integer|min:0',
+            'nivel_critico' => 'nullable|integer|min:0',
+        ]);
+
+        $inventario->update($validated);
         return redirect()->route('inventario.index')->with('success', 'Producto actualizado');
     }
 
     public function destroy(Inventario $inventario)
     {
+        $proyectoId = $this->resolveActiveProyectoId(request());
+
+        if ((int) $inventario->proyecto_id !== $proyectoId) {
+            abort(404);
+        }
+
         $inventario->delete();
         return redirect()->route('inventario.index')->with('success', 'Producto eliminado');
     }

@@ -15,7 +15,7 @@ class ProyectoContextController extends Controller
             return redirect()->route('login');
         }
 
-        $perteneceAlProyecto = $user
+        $perteneceAlProyecto = $user->role === 'superadmin' || $user
             ->proyectos()
             ->where('proyectos.id', $proyecto->id)
             ->exists();

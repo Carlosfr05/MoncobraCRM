@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Inventario extends Model
+class PedidoCliente extends Model
 {
     use HasFactory;
 
@@ -15,7 +15,7 @@ class Inventario extends Model
      *
      * @var string
      */
-    protected $table = 'inventario';
+    protected $table = 'pedidos_clientes';
 
     /**
      * The attributes that are mass assignable.
@@ -23,16 +23,12 @@ class Inventario extends Model
      * @var array<int, string>
      */
     protected $fillable = [
+        'id_cliente',
         'proyecto_id',
-        'codigo',
-        'descripcion',
-        'referencia_proveedor',
-        'clase',
-        'ubicacion',
-        'almacen',
-        'stock_actual',
-        'stock_minimo',
-        'nivel_critico',
+        'numero_pedido',
+        'fecha_pedido',
+        'ot',
+        'lista_articulos',
     ];
 
     /**
@@ -41,13 +37,20 @@ class Inventario extends Model
      * @var array<string, string>
      */
     protected $casts = [
-        'stock_actual' => 'integer',
-        'stock_minimo' => 'integer',
-        'nivel_critico' => 'integer',
+        'fecha_pedido' => 'date',
+        'lista_articulos' => 'array',
     ];
 
     /**
-     * Get the proyecto that owns the inventario item.
+     * Get the cliente that owns the pedido.
+     */
+    public function cliente(): BelongsTo
+    {
+        return $this->belongsTo(Cliente::class, 'id_cliente');
+    }
+
+    /**
+     * Get the proyecto that owns the pedido.
      */
     public function proyecto(): BelongsTo
     {

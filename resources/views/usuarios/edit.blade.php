@@ -113,6 +113,10 @@
                                     <i class="fas fa-info-circle"></i> Como Super Admin, puedes asignar cualquier rol.
                                 @endif
                             </small>
+                            <small class="form-text text-info d-none" id="superadmin-proyectos-info-edit">
+                                <i class="fas fa-diagram-project"></i>
+                                Los Super Admin tienen acceso automático a todos los proyectos.
+                            </small>
                         </div>
 
                         <!-- Teléfono -->
@@ -234,4 +238,42 @@
         </div>
     </div>
     </div>
+@endsection
+
+@section('js')
+    <script>
+        (function () {
+            const roleSelect = document.getElementById('role');
+            const superadminInfo = document.getElementById('superadmin-proyectos-info-edit');
+
+            if (!roleSelect) {
+                return;
+            }
+
+            const setEnabledState = (container, enabled) => {
+                container.querySelectorAll('input, select, textarea, button').forEach((element) => {
+                    element.disabled = !enabled;
+                });
+            };
+
+            const toggleProjectBlocksByRole = () => {
+                const isSuperadmin = roleSelect.value === 'superadmin';
+
+                if (superadminInfo) {
+                    superadminInfo.classList.toggle('d-none', !isSuperadmin);
+                }
+
+                // Si existen bloques de proyectos en esta vista, se ocultan y bloquean para superadmin.
+                const projectBlocks = document.querySelectorAll('[data-project-block], #proyectos-wrapper, .project-selector');
+
+                projectBlocks.forEach((block) => {
+                    block.style.display = isSuperadmin ? 'none' : '';
+                    setEnabledState(block, !isSuperadmin);
+                });
+            };
+
+            roleSelect.addEventListener('change', toggleProjectBlocksByRole);
+            toggleProjectBlocksByRole();
+        })();
+    </script>
 @endsection

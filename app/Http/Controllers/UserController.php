@@ -81,7 +81,11 @@ class UserController extends Controller
             'activo' => $request->boolean('activo', true),
         ]);
 
-        $user->proyectos()->sync($validated['proyecto_ids'] ?? []);
+        if ($user->role === 'superadmin') {
+            $user->syncAllProjectsIfSuperadmin();
+        } else {
+            $user->proyectos()->sync($validated['proyecto_ids'] ?? []);
+        }
 
         return redirect()->route('users.index')->with('success', 'Usuario creado correctamente.');
     }
@@ -128,6 +132,10 @@ class UserController extends Controller
 
         $user->update($validated);
 
+        if ($user->role === 'superadmin') {
+            $user->syncAllProjectsIfSuperadmin();
+        }
+
         return redirect()->route('users.index')->with('success', 'Usuario actualizado correctamente.');
     }
 
@@ -153,6 +161,10 @@ class UserController extends Controller
         }
 
         $user->update(['role' => $request->input('role')]);
+
+        if ($user->role === 'superadmin') {
+            $user->syncAllProjectsIfSuperadmin();
+        }
 
         return response()->json(['success' => true, 'message' => 'Rol actualizado correctamente.']);
     }

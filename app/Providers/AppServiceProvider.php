@@ -75,6 +75,11 @@ class AppServiceProvider extends ServiceProvider
             }
             return false;
         });
+
+        // Gate para gestionar proyectos (solo superadmin)
+        Gate::define('manage-projects', function (User $user) {
+            return $user->role === 'superadmin';
+        });
     }
 }
 

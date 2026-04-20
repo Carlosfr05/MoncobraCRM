@@ -27,6 +27,7 @@ class Presupuesto extends Model
         'numero',
         'fecha',
         'cliente_id',
+        'proyecto_id',
         'titulo',
         'ot',
     ];
@@ -46,5 +47,13 @@ class Presupuesto extends Model
     public function cliente(): BelongsTo
     {
         return $this->belongsTo(Cliente::class, 'cliente_id');
+    }
+
+    /**
+     * Get the proyecto that owns the presupuesto.
+     */
+    public function proyecto(): BelongsTo
+    {
+        return $this->belongsTo(Proyecto::class, 'proyecto_id');
     }
 }

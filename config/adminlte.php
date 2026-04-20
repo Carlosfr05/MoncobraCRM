@@ -385,6 +385,16 @@ return [
             'can' => 'manage-users',
             'classes' => 'sidebar-tools-item',
         ],
+
+        // Gestión de Proyectos - Solo superadmin
+        [
+            'text' => 'Gestión Proyectos',
+            'url' => 'herramientas/gestion-proyectos',
+            'icon' => 'fas fa-fw fa-code-branch',
+            'active' => ['herramientas/gestion-proyectos*'],
+            'can' => 'manage-projects',
+            'classes' => 'sidebar-tools-item',
+        ],
     ],
 
     /*

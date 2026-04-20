@@ -20,7 +20,9 @@ class ClienteController extends Controller
      */
     public function index()
     {
-        $clientes = Cliente::paginate(15);
+        $proyectoId = $this->resolveActiveProyectoId(request());
+        $clientes = Cliente::where('proyecto_id', $proyectoId)->paginate(15);
+
         return view('clientes.index', compact('clientes'));
     }
 
@@ -37,7 +39,9 @@ class ClienteController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
+        $proyectoId = $this->resolveActiveProyectoId($request);
+
+        $validated = $request->validate([
             'empresa_nombre' => 'required|string|max:255',
             'cif_nif' => 'required|unique:clientes,cif_nif|max:20',
             'direccion' => 'required|string|max:255',
@@ -48,7 +52,9 @@ class ClienteController extends Controller
             'persona_contacto' => 'nullable|string|max:100',
         ]);
 
-        Cliente::create($request->all());
+        $validated['proyecto_id'] = $proyectoId;
+
+        Cliente::create($validated);
 
         return redirect()->route('clientes.index')->with('success', 'Cliente creado exitosamente');
     }
@@ -58,6 +64,12 @@ class ClienteController extends Controller
      */
     public function show(Cliente $cliente)
     {
+        $proyectoId = $this->resolveActiveProyectoId(request());
+
+        if ((int) $cliente->proyecto_id !== $proyectoId) {
+            abort(404);
+        }
+
         return view('clientes.show', compact('cliente'));
     }
 
@@ -66,6 +78,12 @@ class ClienteController extends Controller
      */
     public function edit(Cliente $cliente)
     {
+        $proyectoId = $this->resolveActiveProyectoId(request());
+
+        if ((int) $cliente->proyecto_id !== $proyectoId) {
+            abort(404);
+        }
+
         return view('clientes.edit', compact('cliente'));
     }
 
@@ -74,7 +92,13 @@ class ClienteController extends Controller
      */
     public function update(Request $request, Cliente $cliente)
     {
-        $request->validate([
+        $proyectoId = $this->resolveActiveProyectoId($request);
+
+        if ((int) $cliente->proyecto_id !== $proyectoId) {
+            abort(404);
+        }
+
+        $validated = $request->validate([
             'empresa_nombre' => 'required|string|max:255',
             'cif_nif' => 'required|unique:clientes,cif_nif,' . $cliente->id . '|max:20',
             'direccion' => 'required|string|max:255',
@@ -85,7 +109,7 @@ class ClienteController extends Controller
             'persona_contacto' => 'nullable|string|max:100',
         ]);
 
-        $cliente->update($request->all());
+        $cliente->update($validated);
 
         return redirect()->route('clientes.index')->with('success', 'Cliente actualizado exitosamente');
     }
@@ -95,6 +119,12 @@ class ClienteController extends Controller
      */
     public function destroy(Cliente $cliente)
     {
+        $proyectoId = $this->resolveActiveProyectoId(request());
+
+        if ((int) $cliente->proyecto_id !== $proyectoId) {
+            abort(404);
+        }
+
         $cliente->delete();
 
         return redirect()->route('clientes.index')->with('success', 'Cliente eliminado exitosamente');

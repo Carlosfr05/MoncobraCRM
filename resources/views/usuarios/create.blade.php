@@ -96,10 +96,10 @@
                                 @error('role')
                                     <span class="invalid-feedback">{{ $message }}</span>
                                 @enderror
-                                <small class="form-text text-muted">Si eliges rol Usuario, debes asignar al menos un proyecto.</small>
+                                <small class="form-text text-muted">Si eliges rol Usuario, debes asignar al menos un proyecto. Si eliges Super Admin, se asignarán todos automáticamente.</small>
                             </div>
 
-                            <div class="form-group">
+                            <div class="form-group" id="proyectos-wrapper">
                                 <label for="proyecto_ids">Proyectos asignados</label>
                                 <div class="project-selector @error('proyecto_ids') is-invalid @enderror @error('proyecto_ids.*') is-invalid @enderror">
                                     <div class="project-selector-header">
@@ -131,6 +131,10 @@
                                     <span class="invalid-feedback">{{ $message }}</span>
                                 @enderror
                                 <small class="form-text text-muted">Puedes seleccionar uno, varios o todos los proyectos.</small>
+                                <small class="form-text text-info d-none" id="superadmin-proyectos-info">
+                                    <i class="fas fa-info-circle"></i>
+                                    Al crear un Super Admin, el sistema le asigna automáticamente todos los proyectos.
+                                </small>
                             </div>
 
                             <div class="form-group">
@@ -193,30 +197,72 @@
 @section('js')
     <script>
         (function () {
+            const roleSelect = document.getElementById('role');
             const selectAll = document.getElementById('select-all-proyectos');
             const projectCheckboxes = Array.from(document.querySelectorAll('input[name="proyecto_ids[]"]'));
-
-            if (!selectAll || projectCheckboxes.length === 0) {
-                return;
-            }
+            const proyectosWrapper = document.getElementById('proyectos-wrapper');
+            const superadminInfo = document.getElementById('superadmin-proyectos-info');
 
             const syncSelectAll = () => {
+                if (!selectAll || projectCheckboxes.length === 0) {
+                    return;
+                }
+
                 selectAll.checked = projectCheckboxes.every(checkbox => checkbox.checked);
                 selectAll.indeterminate = !selectAll.checked && projectCheckboxes.some(checkbox => checkbox.checked);
             };
 
-            selectAll.addEventListener('change', function () {
-                projectCheckboxes.forEach(checkbox => {
-                    checkbox.checked = this.checked;
+            if (selectAll) {
+                selectAll.addEventListener('change', function () {
+                    projectCheckboxes.forEach(checkbox => {
+                        checkbox.checked = this.checked;
+                    });
+                    syncSelectAll();
                 });
-                syncSelectAll();
-            });
+            }
 
             projectCheckboxes.forEach(checkbox => {
                 checkbox.addEventListener('change', syncSelectAll);
             });
 
+            const updateProjectSelectorByRole = () => {
+                const isSuperadmin = roleSelect && roleSelect.value === 'superadmin';
+
+                if (proyectosWrapper) {
+                    proyectosWrapper.style.opacity = isSuperadmin ? '0.55' : '1';
+                }
+
+                if (superadminInfo) {
+                    superadminInfo.classList.toggle('d-none', !isSuperadmin);
+                }
+
+                if (isSuperadmin) {
+                    if (selectAll) {
+                        selectAll.checked = false;
+                        selectAll.indeterminate = false;
+                    }
+                }
+
+                if (selectAll) {
+                    selectAll.disabled = isSuperadmin;
+                }
+
+                projectCheckboxes.forEach(checkbox => {
+                    checkbox.checked = isSuperadmin ? false : checkbox.checked;
+                    checkbox.disabled = isSuperadmin;
+                });
+
+                if (!isSuperadmin) {
+                    syncSelectAll();
+                }
+            };
+
+            if (roleSelect) {
+                roleSelect.addEventListener('change', updateProjectSelectorByRole);
+            }
+
             syncSelectAll();
+            updateProjectSelectorByRole();
         })();
     </script>
 @endsection

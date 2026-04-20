@@ -6,16 +6,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Inventario extends Model
+class Articulo extends Model
 {
     use HasFactory;
-
-    /**
-     * The table associated with the model.
-     *
-     * @var string
-     */
-    protected $table = 'inventario';
 
     /**
      * The attributes that are mass assignable.
@@ -24,15 +17,12 @@ class Inventario extends Model
      */
     protected $fillable = [
         'proyecto_id',
-        'codigo',
+        'numero_referencia',
         'descripcion',
-        'referencia_proveedor',
-        'clase',
-        'ubicacion',
-        'almacen',
-        'stock_actual',
-        'stock_minimo',
-        'nivel_critico',
+        'cantidad',
+        'precio_unitario',
+        'margen',
+        'total',
     ];
 
     /**
@@ -41,13 +31,14 @@ class Inventario extends Model
      * @var array<string, string>
      */
     protected $casts = [
-        'stock_actual' => 'integer',
-        'stock_minimo' => 'integer',
-        'nivel_critico' => 'integer',
+        'cantidad' => 'decimal:2',
+        'precio_unitario' => 'decimal:2',
+        'margen' => 'decimal:2',
+        'total' => 'decimal:2',
     ];
 
     /**
-     * Get the proyecto that owns the inventario item.
+     * Get the proyecto that owns the articulo.
      */
     public function proyecto(): BelongsTo
     {

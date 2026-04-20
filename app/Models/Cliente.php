@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Cliente extends Model
@@ -23,6 +24,7 @@ class Cliente extends Model
      * @var array<int, string>
      */
     protected $fillable = [
+        'proyecto_id',
         'empresa_nombre',
         'cif_nif',
         'direccion',
@@ -32,6 +34,14 @@ class Cliente extends Model
         'email',
         'persona_contacto',
     ];
+
+    /**
+     * Get the proyecto that owns the cliente.
+     */
+    public function proyecto(): BelongsTo
+    {
+        return $this->belongsTo(Proyecto::class, 'proyecto_id');
+    }
 
     /**
      * Get all albaranes for this cliente.
@@ -47,5 +57,13 @@ class Cliente extends Model
     public function presupuestos(): HasMany
     {
         return $this->hasMany(Presupuesto::class, 'cliente_id');
+    }
+
+    /**
+     * Get all pedidos clientes for this cliente.
+     */
+    public function pedidosClientes(): HasMany
+    {
+        return $this->hasMany(PedidoCliente::class, 'id_cliente');
     }
 }
