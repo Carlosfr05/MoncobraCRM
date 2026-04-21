@@ -31,7 +31,7 @@ class UserController extends Controller
         $currentUser = auth()->user();
         
         // Admin y Superadmin ven a TODOS los usuarios
-        $users = User::with('proyectos')->paginate(15);
+        $users = User::with('proyectos')->paginate(10);
 
         return view('usuarios.index', compact('users', 'currentUser'));
     }

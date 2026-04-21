@@ -11,20 +11,6 @@
     @endphp
 
     <section class="presupuesto-create-ui">
-        <header class="presupuesto-topbar">
-            <nav aria-label="breadcrumb" class="presupuesto-breadcrumbs">
-                <a href="{{ route('dashboard') }}">Inicio</a>
-                <span><i class="fas fa-chevron-right" aria-hidden="true"></i></span>
-                <a href="{{ route('clientes.index') }}">Clientes</a>
-                <span><i class="fas fa-chevron-right" aria-hidden="true"></i></span>
-                <strong>{{ $isCarga ? 'Cargar Presupuesto' : 'Nuevo Presupuesto' }}</strong>
-            </nav>
-        </header>
-
-        <section class="presupuesto-head">
-            <h1>{{ $isCarga ? 'Cargar Presupuesto' : 'Registrar Nuevo Presupuesto' }}</h1>
-            <p>Complete los datos del presupuesto para añadirlo al historial del cliente.</p>
-        </section>
 
         @if ($errors->any())
             <div class="alert alert-danger presupuesto-errors" role="alert">
@@ -40,7 +26,7 @@
         <article class="presupuesto-card">
             <header>
                 <i class="fas fa-file-invoice-dollar" aria-hidden="true"></i>
-                <h2>Datos del Presupuesto</h2>
+                <h2>Presupuesto cliente</h2>
             </header>
 
             <form action="{{ route('presupuestos.store') }}" method="POST" enctype="multipart/form-data" novalidate>
@@ -52,6 +38,21 @@
                 @endif
 
                 <div class="presupuesto-grid">
+                    <div class="field-group">
+                        <label for="documento">Documento</label>
+                        <input type="text" id="documento" name="documento" value="{{ old('documento') }}" placeholder="PRESUPUESTO" class="@error('documento') is-invalid @enderror" maxlength="50" required>
+                    </div>
+
+                    <div class="field-group">
+                        <label for="numero">Numero</label>
+                        <input type="text" id="numero" name="numero" value="{{ old('numero') }}" placeholder="PR2026-016" class="@error('numero') is-invalid @enderror" maxlength="50" required>
+                    </div>
+
+                    <div class="field-group">
+                        <label for="fecha">Fecha</label>
+                        <input type="date" id="fecha" name="fecha" value="{{ old('fecha', now()->toDateString()) }}" class="@error('fecha') is-invalid @enderror" required>
+                    </div>
+
                     <div class="field-group">
                         <label for="cliente_id">Cliente</label>
                         <select id="cliente_id" name="cliente_id" class="@error('cliente_id') is-invalid @enderror" required>
@@ -65,28 +66,13 @@
                     </div>
 
                     <div class="field-group">
-                        <label for="fecha">Fecha</label>
-                        <input type="date" id="fecha" name="fecha" value="{{ old('fecha', now()->toDateString()) }}" class="@error('fecha') is-invalid @enderror" required>
+                        <label for="titulo">Titulo del presupuesto</label>
+                        <input type="text" id="titulo" name="titulo" value="{{ old('titulo') }}" placeholder="Ej: Renovacion flota logistica trimestral" class="@error('titulo') is-invalid @enderror" maxlength="255">
                     </div>
 
                     <div class="field-group">
-                        <label for="documento">Documento</label>
-                        <input type="text" id="documento" name="documento" value="{{ old('documento') }}" placeholder="Presupuesto técnico" class="@error('documento') is-invalid @enderror" maxlength="50" required>
-                    </div>
-
-                    <div class="field-group">
-                        <label for="numero">N° Presupuesto</label>
-                        <input type="text" id="numero" name="numero" value="{{ old('numero') }}" placeholder="PO-AIR-5590" class="@error('numero') is-invalid @enderror" maxlength="50" required>
-                    </div>
-
-                    <div class="field-group field-full">
-                        <label for="titulo">Descripción</label>
-                        <input type="text" id="titulo" name="titulo" value="{{ old('titulo') }}" placeholder="Descripción del trabajo o alcance" class="@error('titulo') is-invalid @enderror" maxlength="255">
-                    </div>
-
-                    <div class="field-group">
-                        <label for="ot">OT</label>
-                        <input type="text" id="ot" name="ot" value="{{ old('ot') }}" placeholder="OT-2024-0012" class="@error('ot') is-invalid @enderror" maxlength="255">
+                        <label for="ot">OT (Orden de trabajo)</label>
+                        <input type="text" id="ot" name="ot" value="{{ old('ot') }}" placeholder="Referencia OT" class="@error('ot') is-invalid @enderror" maxlength="255">
                     </div>
 
                     <div class="field-group field-full">
@@ -96,12 +82,94 @@
                     </div>
                 </div>
 
+                <section class="items-builder" aria-labelledby="items-builder-title">
+                    <header class="items-builder-head">
+                        <h3 id="items-builder-title">Datos del item</h3>
+                        <button type="button" id="btn_agregar_item" class="btn-agregar-item">
+                            Agregar
+                        </button>
+                    </header>
+
+                    <div class="items-form-grid">
+                        <div class="field-group">
+                            <label for="item_articulo">Articulo</label>
+                            <input type="text" id="item_articulo" placeholder="Codigo o referencia">
+                        </div>
+                        <div class="field-group field-span-3">
+                            <label for="item_descripcion">Descripcion</label>
+                            <input type="text" id="item_descripcion" placeholder="Descripcion detallada del material o servicio">
+                        </div>
+                        <div class="field-group">
+                            <label for="item_cantidad">Cantidad</label>
+                            <input type="number" id="item_cantidad" min="0" step="0.01" value="1">
+                        </div>
+                        <div class="field-group">
+                            <label for="item_precio_unitario">Precio unitario</label>
+                            <input type="number" id="item_precio_unitario" min="0" step="0.01" value="0">
+                        </div>
+                        <div class="field-group field-group-margen">
+                            <label for="item_margen">Margen (%)</label>
+                            <input type="number" id="item_margen" min="0" step="0.01" value="0">
+                        </div>
+                    </div>
+
+                    <input type="hidden" id="lista_articulos" name="lista_articulos" value='{{ old('lista_articulos', '[]') }}'>
+
+                    <div class="items-table-wrap">
+                        <table class="items-table" aria-label="Listado de items del presupuesto">
+                            <thead>
+                                <tr>
+                                    <th>Articulo</th>
+                                    <th>Descripcion</th>
+                                    <th>Cantidad</th>
+                                    <th>P. Unitario</th>
+                                    <th>Total</th>
+                                    <th class="actions-col"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="items_tbody">
+                                <tr class="items-empty-row">
+                                    <td colspan="6">No hay items agregados.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
                 <footer class="presupuesto-actions">
-                    <a href="{{ $volverUrl }}" class="btn-cancelar">Cancelar</a>
-                    <button type="submit" class="btn-guardar">
+                    <div class="presupuesto-actions-left">
+                        <button type="button" id="btn_eliminar_item" class="btn-neutral btn-eliminar" disabled>
+                            <i class="fas fa-trash-alt" aria-hidden="true"></i>
+                            Eliminar
+                        </button>
+                        <button type="button" id="btn_editar_item" class="btn-neutral btn-editar" disabled>
+                            <i class="fas fa-pen" aria-hidden="true"></i>
+                            Editar
+                        </button>
+                        <a href="{{ $volverUrl }}" class="btn-neutral btn-salir">
+                            <i class="fas fa-times" aria-hidden="true"></i>
+                            Salir
+                        </a>
+                        <button type="submit" class="btn-guardar">
                         <i class="fas fa-save" aria-hidden="true"></i>
-                        Guardar Presupuesto
-                    </button>
+                            Guardar
+                        </button>
+                    </div>
+
+                    <div class="presupuesto-totals-box" aria-live="polite">
+                        <div class="total-row">
+                            <span>Subtotal</span>
+                            <strong id="items_subtotal">0,00 EUR</strong>
+                        </div>
+                        <div class="total-row">
+                            <span>IVA (21%)</span>
+                            <strong id="items_iva">0,00 EUR</strong>
+                        </div>
+                        <div class="total-row total-final">
+                            <span>Total presupuesto</span>
+                            <strong id="items_total">0,00 EUR</strong>
+                        </div>
+                    </div>
                 </footer>
             </form>
         </article>
@@ -109,223 +177,245 @@
 @endsection
 
 @section('css')
-    <style>
-        .content-wrapper {
-            background: #f3f6fb;
-        }
+    @vite(['resources/css/presupuestos-create.css'])
+@endsection
 
-        .presupuesto-create-ui {
-            max-width: 920px;
-            margin: 0 auto;
-            color: #223248;
-            font-family: "Segoe UI", "Source Sans Pro", sans-serif;
-            padding-bottom: 1rem;
-        }
+@section('js')
+    <script>
+        (function () {
+            const hiddenInput = document.getElementById('lista_articulos');
+            const tbody = document.getElementById('items_tbody');
+            const subtotalEl = document.getElementById('items_subtotal');
+            const ivaEl = document.getElementById('items_iva');
+            const totalEl = document.getElementById('items_total');
 
-        .presupuesto-topbar {
-            margin-bottom: 0.85rem;
-        }
+            const articuloInput = document.getElementById('item_articulo');
+            const descripcionInput = document.getElementById('item_descripcion');
+            const cantidadInput = document.getElementById('item_cantidad');
+            const precioInput = document.getElementById('item_precio_unitario');
+            const margenInput = document.getElementById('item_margen');
+            const addButton = document.getElementById('btn_agregar_item');
+            const editButton = document.getElementById('btn_editar_item');
+            const deleteButton = document.getElementById('btn_eliminar_item');
 
-        .presupuesto-breadcrumbs {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.48rem;
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: #8397b2;
-        }
+            const eur = new Intl.NumberFormat('es-ES', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+            });
 
-        .presupuesto-breadcrumbs a {
-            color: #7088a8;
-            text-decoration: none;
-        }
+            const safeNumber = (value) => {
+                const numeric = Number.parseFloat(String(value).replace(',', '.'));
+                return Number.isFinite(numeric) ? numeric : 0;
+            };
 
-        .presupuesto-breadcrumbs i {
-            font-size: 0.58rem;
-            color: #a6b7cb;
-        }
+            const parseItems = () => {
+                try {
+                    const parsed = JSON.parse(hiddenInput.value || '[]');
+                    return Array.isArray(parsed) ? parsed : [];
+                } catch (error) {
+                    return [];
+                }
+            };
 
-        .presupuesto-head h1 {
-            margin: 0;
-            font-size: 2rem;
-            line-height: 1.1;
-            color: #1f2f45;
-            font-weight: 700;
-        }
+            const items = parseItems();
+            let selectedIndex = -1;
+            let editingIndex = null;
 
-        .presupuesto-head p {
-            margin: 0.4rem 0 1rem;
-            color: #778ba8;
-            font-size: 0.94rem;
-        }
+            const resetItemForm = () => {
+                articuloInput.value = '';
+                descripcionInput.value = '';
+                cantidadInput.value = '1';
+                precioInput.value = '0';
+                margenInput.value = '0';
+                editingIndex = null;
+                addButton.textContent = 'Agregar';
+            };
 
-        .presupuesto-errors {
-            border-radius: 0.74rem;
-            margin-bottom: 1rem;
-        }
+            const setButtonsState = () => {
+                const hasSelection = selectedIndex >= 0 && selectedIndex < items.length;
+                editButton.disabled = !hasSelection;
+                deleteButton.disabled = !hasSelection;
+            };
 
-        .presupuesto-errors ul {
-            margin: 0.45rem 0 0;
-            padding-left: 1.2rem;
-        }
+            const fillFormFromItem = (index) => {
+                const item = items[index];
+                if (!item) {
+                    return;
+                }
 
-        .presupuesto-card {
-            background: #fff;
-            border: 1px solid #d8e1ef;
-            border-radius: 0.82rem;
-            overflow: hidden;
-            box-shadow: 0 16px 30px -28px rgba(19, 53, 99, 0.95);
-        }
+                articuloInput.value = item.articulo || '';
+                descripcionInput.value = item.descripcion || '';
+                cantidadInput.value = String(item.cantidad ?? 1);
+                precioInput.value = String(item.precio_unitario ?? 0);
+                margenInput.value = String(item.margen ?? 0);
+                editingIndex = index;
+                addButton.textContent = 'Actualizar';
+                descripcionInput.focus();
+            };
 
-        .presupuesto-card > header {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 1rem 1.15rem;
-            border-bottom: 1px solid #e6edf8;
-            background: #fbfdff;
-        }
+            const deleteItemAt = (index) => {
+                if (index < 0 || index >= items.length) {
+                    return;
+                }
 
-        .presupuesto-card > header i {
-            color: #1f76de;
-            font-size: 0.9rem;
-        }
+                items.splice(index, 1);
 
-        .presupuesto-card > header h2 {
-            margin: 0;
-            color: #2a3d57;
-            font-size: 1rem;
-            font-weight: 700;
-        }
+                if (editingIndex === index) {
+                    resetItemForm();
+                } else if (editingIndex !== null && editingIndex > index) {
+                    editingIndex -= 1;
+                }
 
-        .presupuesto-card form {
-            padding: 1.15rem 1.25rem 1rem;
-        }
+                if (selectedIndex === index) {
+                    selectedIndex = -1;
+                } else if (selectedIndex > index) {
+                    selectedIndex -= 1;
+                }
 
-        .presupuesto-grid {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 0.9rem 0.95rem;
-        }
+                renderRows();
+            };
 
-        .field-group {
-            display: flex;
-            flex-direction: column;
-            gap: 0.35rem;
-        }
+            const syncHidden = () => {
+                hiddenInput.value = JSON.stringify(items);
+            };
 
-        .field-group label {
-            margin: 0;
-            color: #3e556f;
-            font-size: 0.8rem;
-            font-weight: 700;
-        }
+            const renderTotals = () => {
+                const subtotal = items.reduce((acc, item) => acc + safeNumber(item.total), 0);
+                const iva = subtotal * 0.21;
+                const total = subtotal + iva;
 
-        .field-group input,
-        .field-group select {
-            width: 100%;
-            height: 2.45rem;
-            border: 1px solid #d6dfec;
-            border-radius: 0.48rem;
-            background: #fff;
-            color: #304967;
-            padding: 0 0.72rem;
-            font-size: 0.88rem;
-            transition: border-color 0.2s ease, box-shadow 0.2s ease;
-        }
+                subtotalEl.textContent = `${eur.format(subtotal)} EUR`;
+                ivaEl.textContent = `${eur.format(iva)} EUR`;
+                totalEl.textContent = `${eur.format(total)} EUR`;
+            };
 
-        .field-group input[type="file"] {
-            height: auto;
-            padding: 0.58rem 0.72rem;
-            line-height: 1.3;
-            background: #fbfdff;
-        }
+            const renderRows = () => {
+                if (items.length === 0) {
+                    tbody.innerHTML = '<tr class="items-empty-row"><td colspan="6">No hay items agregados.</td></tr>';
+                    renderTotals();
+                    syncHidden();
+                    setButtonsState();
+                    return;
+                }
 
-        .field-group input:focus,
-        .field-group select:focus {
-            outline: none;
-            border-color: #6caaef;
-            box-shadow: 0 0 0 3px rgba(89, 156, 236, 0.14);
-        }
+                tbody.innerHTML = items.map((item, index) => `
+                    <tr class="${selectedIndex === index ? 'item-selected' : ''}" data-index="${index}">
+                        <td>${String(index + 1).padStart(2, '0')}</td>
+                        <td>${item.articulo ? `<strong>${item.articulo}</strong><br>` : ''}${item.descripcion}</td>
+                        <td>${eur.format(safeNumber(item.cantidad))}</td>
+                        <td>${eur.format(safeNumber(item.precio_unitario))} EUR</td>
+                        <td>${eur.format(safeNumber(item.total))} EUR</td>
+                        <td class="actions-col">
+                            <div class="row-actions">
+                                <button type="button" class="btn-row-action btn-edit-item" data-index="${index}" aria-label="Editar item" title="Editar item">
+                                    <i class="fas fa-pen"></i>
+                                </button>
+                                <button type="button" class="btn-row-action btn-remove-item" data-index="${index}" aria-label="Eliminar item" title="Eliminar item">×</button>
+                            </div>
+                        </td>
+                    </tr>
+                `).join('');
 
-        .field-group .is-invalid {
-            border-color: #d84e61;
-        }
+                renderTotals();
+                syncHidden();
+                setButtonsState();
+            };
 
-        .field-full {
-            grid-column: 1 / -1;
-        }
+            addButton.addEventListener('click', function () {
+                const descripcion = descripcionInput.value.trim();
+                const articulo = articuloInput.value.trim();
+                const cantidad = Math.max(0, safeNumber(cantidadInput.value));
+                const precioUnitario = Math.max(0, safeNumber(precioInput.value));
+                const margen = Math.max(0, safeNumber(margenInput.value));
 
-        .pdf-help {
-            color: #768ba8;
-            font-size: 0.76rem;
-            font-weight: 600;
-        }
+                if (!descripcion || cantidad <= 0) {
+                    window.alert('Complete al menos la descripcion y una cantidad mayor que cero.');
+                    return;
+                }
 
-        .presupuesto-actions {
-            margin-top: 1rem;
-            border-top: 1px solid #e8eef7;
-            padding-top: 0.9rem;
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-            gap: 0.55rem;
-        }
+                const precioConMargen = precioUnitario * (1 + (margen / 100));
+                const total = cantidad * precioConMargen;
 
-        .btn-cancelar,
-        .btn-guardar {
-            height: 2.25rem;
-            border-radius: 0.48rem;
-            padding: 0 1rem;
-            font-size: 0.83rem;
-            font-weight: 700;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            text-decoration: none;
-            gap: 0.4rem;
-        }
+                const payload = {
+                    articulo,
+                    descripcion,
+                    cantidad: Number(cantidad.toFixed(2)),
+                    precio_unitario: Number(precioUnitario.toFixed(2)),
+                    margen: Number(margen.toFixed(2)),
+                    total: Number(total.toFixed(2)),
+                };
 
-        .btn-cancelar {
-            border: 1px solid #d2deec;
-            background: #fff;
-            color: #4d6381;
-        }
+                if (editingIndex !== null && editingIndex >= 0 && editingIndex < items.length) {
+                    items[editingIndex] = payload;
+                    selectedIndex = editingIndex;
+                } else {
+                    items.push(payload);
+                    selectedIndex = items.length - 1;
+                }
 
-        .btn-guardar {
-            border: 1px solid #1f76de;
-            background: #1f76de;
-            color: #fff;
-            box-shadow: 0 8px 14px -11px rgba(31, 118, 222, 0.95);
-        }
+                editingIndex = null;
+                addButton.textContent = 'Agregar';
+                articuloInput.value = '';
+                descripcionInput.value = '';
+                cantidadInput.value = '1';
+                precioInput.value = '0';
+                margenInput.value = '0';
 
-        .btn-cancelar:hover {
-            text-decoration: none;
-            color: #334a67;
-            border-color: #b8cbe3;
-        }
+                renderRows();
+            });
 
-        .btn-guardar:hover {
-            text-decoration: none;
-            color: #fff;
-            background: #1668ca;
-            border-color: #1668ca;
-        }
+            editButton.addEventListener('click', function () {
+                if (selectedIndex < 0 || selectedIndex >= items.length) {
+                    return;
+                }
 
-        @media (max-width: 768px) {
-            .presupuesto-grid {
-                grid-template-columns: 1fr;
-            }
+                fillFormFromItem(selectedIndex);
+                renderRows();
+            });
 
-            .presupuesto-actions {
-                flex-direction: column;
-                align-items: stretch;
-            }
+            deleteButton.addEventListener('click', function () {
+                if (selectedIndex < 0 || selectedIndex >= items.length) {
+                    return;
+                }
 
-            .btn-cancelar,
-            .btn-guardar {
-                width: 100%;
-            }
-        }
-    </style>
+                deleteItemAt(selectedIndex);
+            });
+
+            tbody.addEventListener('click', function (event) {
+                const target = event.target;
+                if (!(target instanceof HTMLElement)) {
+                    return;
+                }
+
+                const removeButton = target.closest('.btn-remove-item');
+                if (removeButton instanceof HTMLElement) {
+                    const index = Number.parseInt(removeButton.dataset.index || '-1', 10);
+                    deleteItemAt(index);
+                    return;
+                }
+
+                const rowEditButton = target.closest('.btn-edit-item');
+                if (rowEditButton instanceof HTMLElement) {
+                    const index = Number.parseInt(rowEditButton.dataset.index || '-1', 10);
+                    if (index >= 0 && index < items.length) {
+                        selectedIndex = index;
+                        fillFormFromItem(index);
+                        renderRows();
+                    }
+                    return;
+                }
+
+                const row = target.closest('tr[data-index]');
+                if (row instanceof HTMLElement) {
+                    const index = Number.parseInt(row.dataset.index || '-1', 10);
+                    if (index >= 0 && index < items.length) {
+                        selectedIndex = index;
+                        renderRows();
+                    }
+                }
+            });
+
+            renderRows();
+        })();
+    </script>
 @endsection

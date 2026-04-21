@@ -58,7 +58,7 @@ class ClienteController extends Controller
 
         $clientes = $clientesQuery
             ->orderBy('empresa_nombre')
-            ->paginate(8)
+            ->paginate(10)
             ->withQueryString();
 
         return view('clientes.index', compact('clientes', 'buscar', 'estado'));

@@ -15,7 +15,7 @@ class InventarioController extends Controller
     public function index()
     {
         $proyectoId = $this->resolveActiveProyectoId(request());
-        $inventarios = Inventario::where('proyecto_id', $proyectoId)->paginate(15);
+        $inventarios = Inventario::where('proyecto_id', $proyectoId)->paginate(10);
 
         return view('inventario.index', compact('inventarios'));
     }

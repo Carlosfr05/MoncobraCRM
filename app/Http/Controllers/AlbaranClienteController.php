@@ -19,7 +19,7 @@ class AlbaranClienteController extends Controller
         $proyectoId = $this->resolveActiveProyectoId(request());
         $albaranes = AlbaranCliente::with('cliente')
             ->where('proyecto_id', $proyectoId)
-            ->paginate(15);
+            ->paginate(10);
 
         return view('albaranes.index', compact('albaranes'));
     }

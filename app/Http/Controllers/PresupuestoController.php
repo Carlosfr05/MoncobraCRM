@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use App\Models\Presupuesto;
 use App\Models\Cliente;
 use Illuminate\Http\Request;
@@ -15,14 +16,45 @@ class PresupuestoController extends Controller
         $this->middleware('auth');
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $proyectoId = $this->resolveActiveProyectoId(request());
-        $presupuestos = Presupuesto::with('cliente')
-            ->where('proyecto_id', $proyectoId)
-            ->paginate(15);
+        $proyectoId = $this->resolveActiveProyectoId($request);
+        $search = trim((string) $request->input('search', ''));
 
-        return view('presupuestos.index', compact('presupuestos'));
+        $presupuestosQuery = Presupuesto::with('cliente')
+            ->where('proyecto_id', $proyectoId);
+
+        if ($search !== '') {
+            $like = '%' . $search . '%';
+            $dateValue = null;
+
+            try {
+                $dateValue = Carbon::parse($search)->toDateString();
+            } catch (\Throwable $exception) {
+                $dateValue = null;
+            }
+
+            $presupuestosQuery->where(function ($query) use ($like, $dateValue) {
+                $query->where('documento', 'like', $like)
+                    ->orWhere('numero', 'like', $like)
+                    ->orWhere('ot', 'like', $like)
+                    ->orWhereHas('cliente', function ($clienteQuery) use ($like) {
+                        $clienteQuery->where('empresa_nombre', 'like', $like);
+                    });
+
+                if ($dateValue) {
+                    $query->orWhereDate('fecha', $dateValue);
+                }
+            });
+        }
+
+        $presupuestos = $presupuestosQuery
+            ->orderByDesc('fecha')
+            ->orderByDesc('id')
+            ->paginate(10)
+            ->withQueryString();
+
+        return view('presupuestos.index', compact('presupuestos', 'search'));
     }
 
     public function create(Request $request)
@@ -61,6 +93,7 @@ class PresupuestoController extends Controller
             'titulo' => 'nullable|string|max:255',
             'ot' => 'nullable|string|max:255',
             'archivo_pdf' => [$archivoPdfRule, 'file', 'mimes:pdf', 'max:10240'],
+            'lista_articulos' => 'nullable|json',
         ]);
 
         $validated['proyecto_id'] = $proyectoId;
@@ -68,6 +101,36 @@ class PresupuestoController extends Controller
         if ($request->hasFile('archivo_pdf')) {
             $validated['archivo_pdf'] = $request->file('archivo_pdf')->store('presupuestos', 'public');
         }
+
+        $listaArticulos = json_decode((string) ($validated['lista_articulos'] ?? '[]'), true);
+        $validated['lista_articulos'] = collect(is_array($listaArticulos) ? $listaArticulos : [])
+            ->filter(fn ($item) => is_array($item) && !empty(trim((string) ($item['descripcion'] ?? ''))))
+            ->map(function (array $item) {
+                $cantidad = max(0, (float) ($item['cantidad'] ?? 0));
+                $precioUnitario = max(0, (float) ($item['precio_unitario'] ?? 0));
+                $margen = max(0, (float) ($item['margen'] ?? 0));
+                $total = max(0, (float) ($item['total'] ?? 0));
+
+                return [
+                    'articulo' => trim((string) ($item['articulo'] ?? '')),
+                    'descripcion' => trim((string) ($item['descripcion'] ?? '')),
+                    'cantidad' => round($cantidad, 2),
+                    'precio_unitario' => round($precioUnitario, 2),
+                    'margen' => round($margen, 2),
+                    'total' => round($total, 2),
+                ];
+            })
+            ->values()
+            ->all();
+
+        if ($validated['lista_articulos'] === []) {
+            $validated['lista_articulos'] = null;
+        }
+
+        $validated['total'] = collect($validated['lista_articulos'] ?? [])->sum(function (array $item) {
+            return (float) ($item['total'] ?? 0);
+        });
+        $validated['estado'] = 'pendiente';
 
         Presupuesto::create($validated);
 
@@ -150,9 +213,13 @@ class PresupuestoController extends Controller
             ],
             'titulo' => 'nullable|string|max:255',
             'ot' => 'nullable|string|max:255',
+            'total' => 'nullable|numeric|min:0',
+            'estado' => ['nullable', Rule::in(['pendiente', 'aceptado', 'rechazado', 'pendiente pedido'])],
         ]);
 
         $validated['proyecto_id'] = $proyectoId;
+        $validated['total'] = isset($validated['total']) ? round((float) $validated['total'], 2) : (float) $presupuesto->total;
+        $validated['estado'] = $validated['estado'] ?? ($presupuesto->estado ?: 'pendiente');
 
         $presupuesto->update($validated);
         return redirect()->route('presupuestos.index')->with('success', 'Presupuesto actualizado');

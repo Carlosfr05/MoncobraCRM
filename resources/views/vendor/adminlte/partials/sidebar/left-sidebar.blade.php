@@ -26,6 +26,10 @@
 
                 $activeProyectoId = $activeProyecto->id;
                 $activeProyectoNombre = $activeProyecto->nombre;
+
+                if ($sessionProyectoId !== (int) $activeProyectoId) {
+                    session(['active_proyecto_id' => $activeProyectoId]);
+                }
             }
         }
 

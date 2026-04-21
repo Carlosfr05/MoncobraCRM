@@ -30,7 +30,10 @@ class Presupuesto extends Model
         'proyecto_id',
         'titulo',
         'ot',
+        'total',
+        'estado',
         'archivo_pdf',
+        'lista_articulos',
     ];
 
     /**
@@ -40,6 +43,8 @@ class Presupuesto extends Model
      */
     protected $casts = [
         'fecha' => 'date',
+        'total' => 'decimal:2',
+        'lista_articulos' => 'array',
     ];
 
     /**
