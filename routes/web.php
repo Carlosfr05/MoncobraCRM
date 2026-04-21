@@ -24,7 +24,7 @@ Route::get('/', function () {
 });
 
 // Authentication Routes
-Auth::routes();
+Auth::routes(['register' => false]);
 
 // Protected Routes (Require Authentication)
 Route::middleware('auth')->group(function () {
@@ -63,6 +63,7 @@ Route::middleware('auth')->group(function () {
     // Recursos CRUD
     Route::resource('clientes', ClienteController::class);
     Route::resource('albaranes', AlbaranClienteController::class);
+    Route::get('presupuestos/{presupuesto}/pdf', [PresupuestoController::class, 'viewPdf'])->name('presupuestos.pdf');
     Route::resource('presupuestos', PresupuestoController::class);
     Route::resource('bolsa', BolsaController::class);
     Route::resource('proveedores', ProveedorController::class);

@@ -30,6 +30,7 @@ class Presupuesto extends Model
         'proyecto_id',
         'titulo',
         'ot',
+        'archivo_pdf',
     ];
 
     /**
