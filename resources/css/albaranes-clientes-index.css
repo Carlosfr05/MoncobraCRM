@@ -1,0 +1,465 @@
+.content-wrapper {
+    background: #f4f7fb;
+}
+
+.albaranes-clientes-ui {
+    color: #1e2a3a;
+    font-family: "Segoe UI", "Source Sans Pro", sans-serif;
+}
+
+.albaranes-alert-success {
+    margin-bottom: 1rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    border: 1px solid #b7e6cb;
+    background: #ebf9f1;
+    color: #247a48;
+    border-radius: 0.75rem;
+    padding: 0.65rem 0.9rem;
+    font-size: 0.88rem;
+    font-weight: 700;
+}
+
+.albaranes-alert-error {
+    margin-bottom: 1rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    border: 1px solid #f2c6c6;
+    background: #fff3f3;
+    color: #9f2c2c;
+    border-radius: 0.75rem;
+    padding: 0.65rem 0.9rem;
+    font-size: 0.88rem;
+    font-weight: 700;
+}
+
+.albaranes-toolbar {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 1rem;
+}
+
+.albaranes-toolbar-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.65rem;
+}
+
+.toolbar-icon-btn {
+    width: 2.35rem;
+    height: 2.35rem;
+    border: 1px solid #d5dfeb;
+    border-radius: 0.7rem;
+    background: #ffffff;
+    color: #677a93;
+}
+
+.toolbar-icon-btn:hover {
+    border-color: #b6cbe6;
+    color: #2b5d9c;
+}
+
+.toolbar-main-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.6rem 1rem;
+    border-radius: 0.7rem;
+    background: linear-gradient(120deg, #2f82ee, #196bd2);
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 0.86rem;
+    text-decoration: none;
+}
+
+.toolbar-main-btn:hover {
+    color: #ffffff;
+    transform: translateY(-1px);
+}
+
+.albaranes-kpis-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.kpi-card {
+    background: #ffffff;
+    border: 1px solid #dde6f2;
+    border-radius: 0.85rem;
+    padding: 1.05rem 1.15rem;
+}
+
+.kpi-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.kpi-icon {
+    width: 2rem;
+    height: 2rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.6rem;
+    font-size: 0.82rem;
+}
+
+.kpi-blue {
+    background: #eaf3ff;
+    color: #2e78dd;
+}
+
+.kpi-amber {
+    background: #fff5e8;
+    color: #d99d38;
+}
+
+.kpi-green {
+    background: #e9fbf4;
+    color: #21a26b;
+}
+
+.kpi-badge {
+    border-radius: 999px;
+    background: #e8fbf3;
+    color: #1f9768;
+    padding: 0.22rem 0.55rem;
+    font-size: 0.67rem;
+    font-weight: 700;
+}
+
+.kpi-badge-green {
+    background: #dff9eb;
+    color: #158957;
+}
+
+.kpi-title {
+    margin: 0.7rem 0 0.35rem;
+    color: #70809a;
+    font-size: 0.84rem;
+}
+
+.kpi-value {
+    margin: 0;
+    color: #18263a;
+    font-size: 2rem;
+    line-height: 1;
+    font-weight: 800;
+}
+
+.albaranes-card {
+    background: #ffffff;
+    border: 1px solid #dbe5f2;
+    border-radius: 0.9rem;
+    overflow: hidden;
+}
+
+.filters-row {
+    display: grid;
+    grid-template-columns: 1fr auto minmax(120px, 140px) auto minmax(120px, 140px) auto auto;
+    gap: 0.75rem;
+    align-items: center;
+    padding: 0.9rem 1rem;
+    border-bottom: 1px solid #e8eef7;
+}
+
+.ot-filter-box {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    border: 1px solid #d6dfeb;
+    border-radius: 0.6rem;
+    background: #f9fbfe;
+    padding: 0 0.75rem;
+}
+
+.ot-filter-box i {
+    color: #8a9ab1;
+    font-size: 0.82rem;
+}
+
+.ot-filter-box input {
+    width: 100%;
+    height: 2.25rem;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: #324960;
+    font-size: 0.85rem;
+}
+
+.date-label {
+    margin: 0;
+    color: #536783;
+    font-size: 0.82rem;
+    font-weight: 600;
+}
+
+.date-input {
+    height: 2.25rem;
+    border: 1px solid #d6dfeb;
+    border-radius: 0.6rem;
+    background: #f9fbfe;
+    padding: 0 0.55rem;
+    color: #334961;
+    font-size: 0.84rem;
+}
+
+.filter-btn,
+.clear-btn {
+    height: 2.25rem;
+    border-radius: 0.6rem;
+    padding: 0 0.9rem;
+    font-size: 0.84rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    text-decoration: none;
+    border: 1px solid transparent;
+}
+
+.filter-btn {
+    border-color: #1f74dd;
+    background: #1f74dd;
+    color: #ffffff;
+}
+
+.clear-btn {
+    border-color: #d5deeb;
+    background: #ffffff;
+    color: #445c79;
+}
+
+.filter-btn:hover,
+.clear-btn:hover {
+    text-decoration: none;
+}
+
+.table-wrapper {
+    margin: 0;
+}
+
+.albaranes-table {
+    margin-bottom: 0;
+}
+
+.albaranes-table thead th {
+    border-top: 0;
+    border-bottom: 1px solid #e7edf6;
+    color: #6d809a;
+    font-size: 0.67rem;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    font-weight: 800;
+    padding: 0.9rem 0.75rem;
+    white-space: nowrap;
+}
+
+.albaranes-table tbody td {
+    border-top: 1px solid #edf2f8;
+    vertical-align: middle;
+    padding: 0.85rem 0.75rem;
+    color: #2c415d;
+    font-size: 0.84rem;
+    white-space: nowrap;
+}
+
+.code-link {
+    color: #1f72d8;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.code-link:hover {
+    color: #0f58b4;
+    text-decoration: underline;
+}
+
+.ot-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 1.45rem;
+    min-width: 3.3rem;
+    border-radius: 999px;
+    background: #edf1f6;
+    color: #445a76;
+    font-weight: 700;
+    font-size: 0.71rem;
+    padding: 0 0.55rem;
+}
+
+.estado-chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 6.2rem;
+    height: 1.4rem;
+    border-radius: 999px;
+    font-size: 0.64rem;
+    font-weight: 800;
+    letter-spacing: 0.03em;
+}
+
+.estado-pendiente {
+    background: #fff1d7;
+    color: #9f6a13;
+}
+
+.estado-recibido {
+    background: #e7efff;
+    color: #265cb6;
+}
+
+.estado-entregado {
+    background: #dff8e9;
+    color: #168852;
+}
+
+.acciones-col {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+}
+
+.estado-form {
+    margin: 0;
+}
+
+.estado-select {
+    height: 1.95rem;
+    border: 1px solid #d6dfeb;
+    border-radius: 0.5rem;
+    color: #334b66;
+    font-size: 0.75rem;
+    font-weight: 700;
+    background: #f9fbfe;
+    padding: 0 0.4rem;
+}
+
+.accion-eye {
+    width: 1.95rem;
+    height: 1.95rem;
+    border: 1px solid #d5deeb;
+    border-radius: 0.5rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #6a7f9a;
+    background: #f8fbff;
+    text-decoration: none;
+}
+
+.accion-edit,
+.accion-lock {
+    width: 1.95rem;
+    height: 1.95rem;
+    border: 1px solid #d5deeb;
+    border-radius: 0.5rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #f8fbff;
+    text-decoration: none;
+}
+
+.accion-edit {
+    color: #6a7f9a;
+}
+
+.accion-edit:hover {
+    color: #1f72d8;
+    border-color: #b5cce9;
+}
+
+.accion-lock {
+    color: #9aa7b7;
+    cursor: not-allowed;
+}
+
+.accion-eye:hover {
+    color: #1f72d8;
+    border-color: #b5cce9;
+}
+
+.empty-row {
+    text-align: center;
+    color: #73869f;
+    padding: 2rem 1rem;
+}
+
+.table-footer {
+    border-top: 1px solid #e8eef7;
+    padding: 0.9rem 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+}
+
+.table-footer p {
+    margin: 0;
+    color: #647992;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.table-pagination .pagination {
+    margin: 0;
+    gap: 0.3rem;
+}
+
+.table-pagination .page-link {
+    border: 1px solid #d6dfeb;
+    border-radius: 0.48rem;
+    min-width: 2rem;
+    height: 2rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #465f80;
+    font-size: 0.78rem;
+    font-weight: 700;
+}
+
+.table-pagination .page-item.active .page-link {
+    background: #1f74dd;
+    border-color: #1f74dd;
+}
+
+.muted {
+    color: #95a4b8;
+}
+
+@media (max-width: 1200px) {
+    .filters-row {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .date-label {
+        display: none;
+    }
+}
+
+@media (max-width: 992px) {
+    .albaranes-kpis-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .filters-row {
+        grid-template-columns: 1fr;
+    }
+
+    .filter-btn,
+    .clear-btn {
+        width: 100%;
+    }
+}

@@ -31,6 +31,10 @@ class AlbaranCliente extends Model
         'ot',
         'pedido_cliente',
         'titulo',
+        'lista_articulos',
+        'total',
+        'estado',
+        'archivo_pdf',
     ];
 
     /**
@@ -40,6 +44,8 @@ class AlbaranCliente extends Model
      */
     protected $casts = [
         'fecha' => 'date',
+        'lista_articulos' => 'array',
+        'total' => 'decimal:2',
     ];
 
     /**

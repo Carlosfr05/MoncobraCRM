@@ -7,17 +7,216 @@
 @endsection
 
 @section('content')
-    <div class="card">
-        <div class="card-header">
-            <h3 class="card-title">Listado de Albaranes</h3>
-            <div class="card-tools">
-                <a href="{{ route('albaranes.create') }}" class="btn btn-primary btn-sm">
-                    <i class="fas fa-plus"></i> Nuevo Albarán
+    @php
+        $textoVariacionMensual = ($variacionMensual >= 0 ? '+' : '') . number_format($variacionMensual, 1, ',', '.') . '% vs mes ant.';
+        $textoVariacionEntregados = ($variacionEntregadosHoy >= 0 ? '+' : '') . number_format($variacionEntregadosHoy, 1, ',', '.') . '% hoy';
+    @endphp
+
+    <section class="albaranes-clientes-ui">
+        @if (session('error'))
+            <div class="albaranes-alert-error">
+                <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
+                {{ session('error') }}
+            </div>
+        @endif
+
+        @if (session('success'))
+            <div class="albaranes-alert-success">
+                <i class="fas fa-check-circle" aria-hidden="true"></i>
+                {{ session('success') }}
+            </div>
+        @endif
+
+        <header class="albaranes-toolbar">
+            <div class="albaranes-toolbar-actions">
+                <button type="button" class="toolbar-icon-btn" aria-label="Notificaciones">
+                    <i class="fas fa-bell"></i>
+                </button>
+                <button type="button" class="toolbar-icon-btn" aria-label="Configuración">
+                    <i class="fas fa-cog"></i>
+                </button>
+                <a href="{{ route('albaranes.create') }}" class="toolbar-main-btn">
+                    Crear Albarán
+                    <i class="fas fa-plus"></i>
                 </a>
             </div>
+        </header>
+
+        <div class="albaranes-kpis-grid">
+            <article class="kpi-card">
+                <div class="kpi-head">
+                    <span class="kpi-icon kpi-blue"><i class="far fa-file-alt"></i></span>
+                    <span class="kpi-badge">{{ $textoVariacionMensual }}</span>
+                </div>
+                <p class="kpi-title">Albaranes Totales</p>
+                <p class="kpi-value">{{ number_format($totalAlbaranes, 0, ',', '.') }}</p>
+            </article>
+
+            <article class="kpi-card">
+                <div class="kpi-head">
+                    <span class="kpi-icon kpi-amber"><i class="far fa-clock"></i></span>
+                </div>
+                <p class="kpi-title">Pendientes de Entrega</p>
+                <p class="kpi-value">{{ number_format($pendientesEntrega, 0, ',', '.') }}</p>
+            </article>
+
+            <article class="kpi-card">
+                <div class="kpi-head">
+                    <span class="kpi-icon kpi-green"><i class="far fa-check-circle"></i></span>
+                    <span class="kpi-badge kpi-badge-green">{{ $textoVariacionEntregados }}</span>
+                </div>
+                <p class="kpi-title">Entregados Hoy</p>
+                <p class="kpi-value">{{ number_format($entregadosHoy, 0, ',', '.') }}</p>
+            </article>
         </div>
-        <div class="card-body">
-            <p class="text-muted">Módulo en desarrollo...</p>
-        </div>
-    </div>
+
+        <article class="albaranes-card">
+            <form method="GET" action="{{ route('albaranes.index') }}" class="filters-row">
+                <div class="ot-filter-box">
+                    <i class="fas fa-filter" aria-hidden="true"></i>
+                    <input
+                        type="text"
+                        name="ot"
+                        value="{{ $ot }}"
+                        placeholder="Filtrar por OT (ej: 383, 363)..."
+                        aria-label="Filtrar por OT"
+                    >
+                </div>
+
+                <label class="date-label" for="desde">Desde:</label>
+                <input type="date" id="desde" name="desde" value="{{ $desde }}" class="date-input">
+
+                <label class="date-label" for="hasta">Hasta:</label>
+                <input type="date" id="hasta" name="hasta" value="{{ $hasta }}" class="date-input">
+
+                <button type="submit" class="filter-btn">
+                    <i class="fas fa-search"></i>
+                    Filtrar
+                </button>
+
+                <a href="{{ route('albaranes.index') }}" class="clear-btn">Limpiar</a>
+            </form>
+
+            <div class="table-responsive table-wrapper">
+                <table class="table albaranes-table">
+                    <thead>
+                        <tr>
+                            <th>Nº Albarán</th>
+                            <th>Nº Presupuesto</th>
+                            <th>OT Asociada</th>
+                            <th>Fecha Entrega</th>
+                            <th>Cliente</th>
+                            <th>Título</th>
+                            <th>Nº Pedido</th>
+                            <th>Total</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($albaranes as $albaran)
+                            @php
+                                $estado = in_array((string) $albaran->estado, ['pendiente', 'recibido', 'entregado'], true)
+                                    ? (string) $albaran->estado
+                                    : 'pendiente';
+                                $bloqueado = $estado === 'entregado';
+                                $presupuestoNumero = trim((string) ($albaran->documento ?? ''));
+                                $pedidoNumero = trim((string) ($albaran->pedido_cliente ?? ''));
+                                $total = (float) ($albaran->ui_total ?? 0);
+                            @endphp
+                            <tr>
+                                <td>
+                                    <a href="{{ route('albaranes.pdf', $albaran) }}" class="code-link">
+                                        {{ $albaran->numero }}
+                                    </a>
+                                </td>
+                                <td>
+                                    @if ($albaran->ui_presupuesto_id)
+                                        <a href="{{ route('presupuestos.show', $albaran->ui_presupuesto_id) }}" class="code-link">
+                                            {{ $presupuestoNumero }}
+                                        </a>
+                                    @elseif ($presupuestoNumero !== '')
+                                        <a href="{{ route('presupuestos.index', ['search' => $presupuestoNumero]) }}" class="code-link">
+                                            {{ $presupuestoNumero }}
+                                        </a>
+                                    @else
+                                        <span class="muted">-</span>
+                                    @endif
+                                </td>
+                                <td>
+                                    <span class="ot-pill">{{ $albaran->ot ?: 'Sin OT' }}</span>
+                                </td>
+                                <td>{{ optional($albaran->fecha)->format('d/m/Y') ?: '-' }}</td>
+                                <td>{{ $albaran->cliente?->empresa_nombre ?: 'Sin cliente' }}</td>
+                                <td>{{ $albaran->titulo ?: '-' }}</td>
+                                <td>
+                                    @if ($albaran->ui_pedido_id)
+                                        <a href="{{ route('pedidos-clientes.show', $albaran->ui_pedido_id) }}" class="code-link">
+                                            {{ $pedidoNumero }}
+                                        </a>
+                                    @elseif ($pedidoNumero !== '')
+                                        <a href="{{ route('pedidos.show', $pedidoNumero) }}" class="code-link">
+                                            {{ $pedidoNumero }}
+                                        </a>
+                                    @else
+                                        <span class="muted">-</span>
+                                    @endif
+                                </td>
+                                <td>{{ number_format($total, 0, ',', '.') }}€</td>
+                                <td>
+                                    <span class="estado-chip estado-{{ $estado }}">{{ strtoupper($estado) }}</span>
+                                </td>
+                                <td>
+                                    <div class="acciones-col">
+                                        <form method="POST" action="{{ route('albaranes.estado.update', $albaran) }}" class="estado-form">
+                                            @csrf
+                                            @method('PATCH')
+                                            <select name="estado" class="estado-select" onchange="this.form.submit()" aria-label="Cambiar estado" @disabled($bloqueado)>
+                                                <option value="pendiente" @selected($estado === 'pendiente')>Pendiente</option>
+                                                <option value="recibido" @selected($estado === 'recibido')>Recibido</option>
+                                                <option value="entregado" @selected($estado === 'entregado')>Entregado</option>
+                                            </select>
+                                        </form>
+
+                                        @if (!$bloqueado)
+                                            <a href="{{ route('albaranes.edit', $albaran) }}" class="accion-edit" title="Editar albarán">
+                                                <i class="far fa-edit"></i>
+                                            </a>
+                                        @else
+                                            <span class="accion-lock" title="Albarán bloqueado por estado entregado">
+                                                <i class="fas fa-lock"></i>
+                                            </span>
+                                        @endif
+
+                                        <a href="{{ route('albaranes.pdf', $albaran) }}" class="accion-eye" title="Ver albarán">
+                                            <i class="far fa-eye"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="10" class="empty-row">No se encontraron albaranes para el filtro indicado.</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+
+            <footer class="table-footer">
+                <p>
+                    Mostrando {{ $albaranes->firstItem() ?? 0 }} a {{ $albaranes->lastItem() ?? 0 }} de {{ number_format($albaranes->total(), 0, ',', '.') }} albaranes
+                </p>
+                @if ($albaranes->hasPages())
+                    <div class="table-pagination">
+                        {{ $albaranes->onEachSide(1)->links('pagination::bootstrap-4') }}
+                    </div>
+                @endif
+            </footer>
+        </article>
+    </section>
+@endsection
+
+@section('css')
+    @vite(['resources/css/albaranes-clientes-index.css'])
 @endsection

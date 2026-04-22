@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\PedidoCliente;
 use Illuminate\Http\Request;
 
 class PedidoController extends Controller
@@ -45,6 +46,21 @@ class PedidoController extends Controller
             'id' => $id,
             'titulo' => 'Detalle del Pedido',
             'breadcrumb' => 'Ver Pedido'
+        ]);
+    }
+
+    public function showCliente(PedidoCliente $pedidoCliente)
+    {
+        $proyectoId = $this->resolveActiveProyectoId(request());
+
+        if ($pedidoCliente->proyecto_id && (int) $pedidoCliente->proyecto_id !== $proyectoId) {
+            abort(404);
+        }
+
+        return view('pedidos.show-cliente', [
+            'pedidoCliente' => $pedidoCliente,
+            'titulo' => 'Detalle del Pedido de Cliente',
+            'breadcrumb' => 'Pedido de Cliente',
         ]);
     }
 

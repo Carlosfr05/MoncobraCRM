@@ -62,6 +62,9 @@ Route::middleware('auth')->group(function () {
     
     // Recursos CRUD
     Route::resource('clientes', ClienteController::class);
+    Route::get('albaranes/{albaran}/pdf', [AlbaranClienteController::class, 'pdfViewer'])->name('albaranes.pdf');
+    Route::get('albaranes/{albaran}/pdf/file', [AlbaranClienteController::class, 'streamPdf'])->name('albaranes.pdf.file');
+    Route::patch('albaranes/{albaran}/estado', [AlbaranClienteController::class, 'updateEstado'])->name('albaranes.estado.update');
     Route::resource('albaranes', AlbaranClienteController::class);
     Route::get('presupuestos/{presupuesto}/pdf', [PresupuestoController::class, 'viewPdf'])->name('presupuestos.pdf');
     Route::resource('presupuestos', PresupuestoController::class);
@@ -69,6 +72,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('proveedores', ProveedorController::class);
     Route::resource('albaranes-proveedores', AlbaranProveedorController::class);
     Route::resource('pedidos', PedidoController::class);
+    Route::get('pedidos-clientes/{pedidoCliente}', [PedidoController::class, 'showCliente'])->name('pedidos-clientes.show');
     
     // Nota: 'only' limita las rutas generadas para optimizar el sistema.
     Route::resource('productos', ProductoController::class)->only(['index']);

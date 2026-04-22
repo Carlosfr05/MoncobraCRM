@@ -4,7 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\AlbaranCliente;
 use App\Models\Cliente;
+use App\Models\PedidoCliente;
+use App\Models\Presupuesto;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 
 class AlbaranClienteController extends Controller
@@ -14,14 +18,127 @@ class AlbaranClienteController extends Controller
         $this->middleware('auth');
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $proyectoId = $this->resolveActiveProyectoId(request());
-        $albaranes = AlbaranCliente::with('cliente')
-            ->where('proyecto_id', $proyectoId)
-            ->paginate(10);
+        $proyectoId = $this->resolveActiveProyectoId($request);
 
-        return view('albaranes.index', compact('albaranes'));
+        $ot = trim((string) $request->query('ot', ''));
+        $desde = trim((string) $request->query('desde', ''));
+        $hasta = trim((string) $request->query('hasta', ''));
+
+        $albaranesQuery = AlbaranCliente::query()
+            ->with('cliente')
+            ->where('proyecto_id', $proyectoId)
+            ->orderByDesc('fecha')
+            ->orderByDesc('id');
+
+        if ($ot !== '') {
+            $otTerms = collect(preg_split('/[\s,;]+/', $ot))
+                ->filter(fn ($value) => trim((string) $value) !== '')
+                ->values();
+
+            if ($otTerms->isNotEmpty()) {
+                $albaranesQuery->where(function ($query) use ($otTerms) {
+                    foreach ($otTerms as $otTerm) {
+                        $query->orWhere('ot', 'like', '%' . trim((string) $otTerm) . '%');
+                    }
+                });
+            }
+        }
+
+        if ($desde !== '') {
+            try {
+                $desdeDate = Carbon::parse($desde)->toDateString();
+                $albaranesQuery->whereDate('fecha', '>=', $desdeDate);
+            } catch (\Throwable $exception) {
+                // Ignore invalid dates and keep the query usable.
+            }
+        }
+
+        if ($hasta !== '') {
+            try {
+                $hastaDate = Carbon::parse($hasta)->toDateString();
+                $albaranesQuery->whereDate('fecha', '<=', $hastaDate);
+            } catch (\Throwable $exception) {
+                // Ignore invalid dates and keep the query usable.
+            }
+        }
+
+        $albaranes = $albaranesQuery
+            ->paginate(8)
+            ->withQueryString();
+
+        $presupuestos = Presupuesto::query()
+            ->where('proyecto_id', $proyectoId)
+            ->whereIn('numero', $albaranes->getCollection()->pluck('documento')->filter()->map(fn ($item) => trim((string) $item))->unique())
+            ->get(['id', 'numero', 'total'])
+            ->keyBy(fn (Presupuesto $presupuesto) => trim((string) $presupuesto->numero));
+
+        $pedidos = PedidoCliente::query()
+            ->where('proyecto_id', $proyectoId)
+            ->whereIn('numero_pedido', $albaranes->getCollection()->pluck('pedido_cliente')->filter()->map(fn ($item) => trim((string) $item))->unique())
+            ->get(['id', 'numero_pedido'])
+            ->keyBy(fn (PedidoCliente $pedido) => trim((string) $pedido->numero_pedido));
+
+        $albaranes->getCollection()->transform(function (AlbaranCliente $albaran) use ($presupuestos, $pedidos) {
+            $presupuestoNumero = trim((string) $albaran->documento);
+            $pedidoNumero = trim((string) $albaran->pedido_cliente);
+
+            $presupuestoRelacionado = $presupuestoNumero !== '' ? $presupuestos->get($presupuestoNumero) : null;
+            $pedidoRelacionado = $pedidoNumero !== '' ? $pedidos->get($pedidoNumero) : null;
+            $totalAlbaran = round((float) ($albaran->total ?? 0), 2);
+
+            $albaran->ui_presupuesto_id = $presupuestoRelacionado?->id;
+            $albaran->ui_total = $totalAlbaran > 0
+                ? $totalAlbaran
+                : ($presupuestoRelacionado ? (float) $presupuestoRelacionado->total : 0);
+            $albaran->ui_pedido_id = $pedidoRelacionado?->id;
+            $albaran->estado = $albaran->estado ?: 'pendiente';
+
+            return $albaran;
+        });
+
+        $baseStatsQuery = AlbaranCliente::query()->where('proyecto_id', $proyectoId);
+        $totalAlbaranes = (clone $baseStatsQuery)->count();
+        $pendientesEntrega = (clone $baseStatsQuery)->where('estado', 'pendiente')->count();
+        $entregadosHoy = (clone $baseStatsQuery)->where('estado', 'entregado')->whereDate('updated_at', now()->toDateString())->count();
+
+        $inicioMesActual = now()->copy()->startOfMonth();
+        $inicioMesAnterior = now()->copy()->subMonthNoOverflow()->startOfMonth();
+        $finMesAnterior = now()->copy()->startOfMonth()->subDay();
+
+        $albaranesMesActual = (clone $baseStatsQuery)
+            ->whereBetween('created_at', [$inicioMesActual, now()])
+            ->count();
+
+        $albaranesMesAnterior = (clone $baseStatsQuery)
+            ->whereBetween('created_at', [$inicioMesAnterior, $finMesAnterior])
+            ->count();
+
+        $variacionMensual = $albaranesMesAnterior > 0
+            ? round((($albaranesMesActual - $albaranesMesAnterior) / $albaranesMesAnterior) * 100, 1)
+            : ($albaranesMesActual > 0 ? 100.0 : 0.0);
+
+        $entregadosAyer = (clone $baseStatsQuery)
+            ->where('estado', 'entregado')
+            ->whereDate('updated_at', now()->copy()->subDay()->toDateString())
+            ->count();
+
+        $variacionEntregadosHoy = $entregadosAyer > 0
+            ? round((($entregadosHoy - $entregadosAyer) / $entregadosAyer) * 100, 1)
+            : ($entregadosHoy > 0 ? 100.0 : 0.0);
+
+        return view('albaranes.index', compact(
+            'albaranes',
+            'ot',
+            'desde',
+            'hasta',
+            'totalAlbaranes',
+            'pendientesEntrega',
+            'entregadosHoy',
+            'variacionMensual',
+            'variacionEntregadosHoy'
+        ));
     }
 
     public function create(Request $request)
@@ -47,9 +164,22 @@ class AlbaranClienteController extends Controller
             'ot' => 'nullable|string|max:255',
             'pedido_cliente' => 'nullable|string|max:255',
             'titulo' => 'nullable|string|max:255',
+            'lineas_json' => 'nullable|json',
+            'estado' => ['nullable', Rule::in(['pendiente', 'recibido', 'entregado'])],
+            'archivo_pdf' => ['nullable', 'file', 'mimes:pdf', 'max:10240'],
         ]);
 
+        $lineas = $this->normalizeLineas($validated['lineas_json'] ?? '[]');
+
         $validated['proyecto_id'] = $proyectoId;
+        $validated['estado'] = $validated['estado'] ?? 'pendiente';
+        $validated['lista_articulos'] = $lineas === [] ? null : $lineas;
+        $validated['total'] = collect($lineas)->sum(fn (array $linea) => (float) ($linea['total'] ?? 0));
+        unset($validated['lineas_json']);
+
+        if ($request->hasFile('archivo_pdf')) {
+            $validated['archivo_pdf'] = $request->file('archivo_pdf')->store('albaranes', 'public');
+        }
 
         AlbaranCliente::create($validated);
         return redirect()->route('albaranes.index')->with('success', 'Albarán creado');
@@ -63,7 +193,10 @@ class AlbaranClienteController extends Controller
             abort(404);
         }
 
-        return view('albaranes.show', compact('albaran'));
+        return view('albaranes.show', [
+            'albaran' => $albaran,
+            'pdfStreamUrl' => $this->resolvePdfPath($albaran) ? route('albaranes.pdf.file', $albaran) : null,
+        ]);
     }
 
     public function edit(Request $request, AlbaranCliente $albaran)
@@ -72,6 +205,10 @@ class AlbaranClienteController extends Controller
 
         if ((int) $albaran->proyecto_id !== $proyectoId) {
             abort(404);
+        }
+
+        if ($this->isDelivered($albaran)) {
+            return redirect()->route('albaranes.index')->with('error', 'No se puede editar un albarán entregado.');
         }
 
         $clientes = Cliente::where('proyecto_id', $proyectoId)->orderBy('empresa_nombre')->get();
@@ -91,6 +228,10 @@ class AlbaranClienteController extends Controller
             abort(404);
         }
 
+        if ($this->isDelivered($albaran)) {
+            return redirect()->route('albaranes.index')->with('error', 'No se puede editar un albarán entregado.');
+        }
+
         $validated = $request->validate([
             'documento' => 'required|string',
             'numero' => 'required|string',
@@ -102,12 +243,89 @@ class AlbaranClienteController extends Controller
             'ot' => 'nullable|string|max:255',
             'pedido_cliente' => 'nullable|string|max:255',
             'titulo' => 'nullable|string|max:255',
+            'lineas_json' => 'nullable|json',
+            'estado' => ['nullable', Rule::in(['pendiente', 'recibido', 'entregado'])],
+            'archivo_pdf' => ['nullable', 'file', 'mimes:pdf', 'max:10240'],
         ]);
 
+        $lineas = $this->normalizeLineas($validated['lineas_json'] ?? '[]');
+
         $validated['proyecto_id'] = $proyectoId;
+        $validated['estado'] = $validated['estado'] ?? ($albaran->estado ?: 'pendiente');
+        $validated['lista_articulos'] = $lineas === [] ? null : $lineas;
+        $validated['total'] = collect($lineas)->sum(fn (array $linea) => (float) ($linea['total'] ?? 0));
+        unset($validated['lineas_json']);
+
+        if ($request->hasFile('archivo_pdf')) {
+            if ($albaran->archivo_pdf && Storage::disk('public')->exists($albaran->archivo_pdf)) {
+                Storage::disk('public')->delete($albaran->archivo_pdf);
+            }
+
+            $validated['archivo_pdf'] = $request->file('archivo_pdf')->store('albaranes', 'public');
+        }
 
         $albaran->update($validated);
         return redirect()->route('albaranes.index')->with('success', 'Albarán actualizado');
+    }
+
+    public function pdfViewer(AlbaranCliente $albaran)
+    {
+        $proyectoId = $this->resolveActiveProyectoId(request());
+
+        if ((int) $albaran->proyecto_id !== $proyectoId) {
+            abort(404);
+        }
+
+        return view('albaranes.show', [
+            'albaran' => $albaran,
+            'pdfStreamUrl' => $this->resolvePdfPath($albaran) ? route('albaranes.pdf.file', $albaran) : null,
+        ]);
+    }
+
+    public function streamPdf(AlbaranCliente $albaran)
+    {
+        $proyectoId = $this->resolveActiveProyectoId(request());
+
+        if ((int) $albaran->proyecto_id !== $proyectoId) {
+            abort(404);
+        }
+
+        $pdfPath = $this->resolvePdfPath($albaran);
+        if (!$pdfPath) {
+            abort(404);
+        }
+
+        $disk = Storage::disk('public');
+        $path = $disk->path($pdfPath);
+        $fileName = basename($pdfPath);
+
+        return response()->file($path, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'inline; filename="' . $fileName . '"',
+        ]);
+    }
+
+    public function updateEstado(Request $request, AlbaranCliente $albaran)
+    {
+        $proyectoId = $this->resolveActiveProyectoId($request);
+
+        if ((int) $albaran->proyecto_id !== $proyectoId) {
+            abort(404);
+        }
+
+        if ($this->isDelivered($albaran)) {
+            return redirect()->back()->with('error', 'El albarán ya está entregado y no admite cambios.');
+        }
+
+        $validated = $request->validate([
+            'estado' => ['required', Rule::in(['pendiente', 'recibido', 'entregado'])],
+        ]);
+
+        $albaran->update([
+            'estado' => $validated['estado'],
+        ]);
+
+        return redirect()->back()->with('success', 'Estado del albarán actualizado.');
     }
 
     public function destroy(AlbaranCliente $albaran)
@@ -120,5 +338,68 @@ class AlbaranClienteController extends Controller
 
         $albaran->delete();
         return redirect()->route('albaranes.index')->with('success', 'Albarán eliminado');
+    }
+
+    private function isDelivered(AlbaranCliente $albaran): bool
+    {
+        return strtolower((string) ($albaran->estado ?? '')) === 'entregado';
+    }
+
+    private function normalizeLineas(?string $lineasJson): array
+    {
+        $decoded = json_decode((string) ($lineasJson ?? '[]'), true);
+        if (!is_array($decoded)) {
+            return [];
+        }
+
+        $lineas = [];
+
+        foreach ($decoded as $linea) {
+            if (!is_array($linea)) {
+                continue;
+            }
+
+            $descripcion = trim((string) ($linea['descripcion'] ?? ''));
+            if ($descripcion === '') {
+                continue;
+            }
+
+            $cantidad = round(max(0, (float) ($linea['cantidad'] ?? 0)), 2);
+            $precio = round(max(0, (float) ($linea['precio'] ?? 0)), 2);
+            $total = round($cantidad * $precio, 2);
+
+            $lineas[] = [
+                'descripcion' => $descripcion,
+                'cantidad' => $cantidad,
+                'precio' => $precio,
+                'total' => $total,
+            ];
+        }
+
+        return $lineas;
+    }
+
+    private function resolvePdfPath(AlbaranCliente $albaran): ?string
+    {
+        $candidates = [];
+
+        $archivoPdf = trim((string) ($albaran->archivo_pdf ?? ''));
+        if ($archivoPdf !== '') {
+            $candidates[] = $archivoPdf;
+        }
+
+        $documento = trim((string) ($albaran->documento ?? ''));
+        if ($documento !== '' && str_ends_with(strtolower($documento), '.pdf')) {
+            $candidates[] = $documento;
+        }
+
+        $disk = Storage::disk('public');
+        foreach (array_unique($candidates) as $path) {
+            if ($disk->exists($path)) {
+                return $path;
+            }
+        }
+
+        return null;
     }
 }
