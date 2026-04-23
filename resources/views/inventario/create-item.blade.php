@@ -1,0 +1,147 @@
+@extends('adminlte::page')
+
+@section('title', 'Crear Nuevo Item de Inventario - MoncobraCRM')
+
+@section('css')
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    @vite(['resources/css/inventario-item-create.css'])
+@endsection
+
+@section('content')
+    <section class="inventory-item-page">
+        <header class="inventory-item-head">
+            <span class="module-tag">MODULO DE INVENTARIO</span>
+            <h1>Crear Nuevo Item de Inventario</h1>
+            <p>Registro de nuevas existencias, especificaciones tecnicas y parametros economicos para el sistema central de logistica.</p>
+        </header>
+
+        @if ($errors->any())
+            <div class="item-alert" role="alert">
+                <strong>No se pudo crear el item.</strong>
+                <ul>
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
+        <div class="inventory-item-layout">
+            <form action="{{ route('inventario.store') }}" method="POST" class="inventory-item-form" novalidate>
+                @csrf
+
+                <section class="item-section">
+                    <aside class="item-section-label">
+                        <span>SECCION 1</span>
+                        <h2>Datos Basicos</h2>
+                        <p>Identificacion fundamental del producto y vinculacion con proveedor oficial.</p>
+                    </aside>
+
+                    <div class="item-section-fields fields-2">
+                        <div class="field-group">
+                            <label for="codigo">Codigo del producto</label>
+                            <input id="codigo" name="codigo" type="text" value="{{ old('codigo') }}" placeholder="Ejem: PRD-2024-X1" class="@error('codigo') is-invalid @enderror" required>
+                        </div>
+
+                        <div class="field-group">
+                            <label for="referencia_proveedor">Referencia proveedor</label>
+                            <input id="referencia_proveedor" name="referencia_proveedor" type="text" value="{{ old('referencia_proveedor') }}" placeholder="REF-8829-00" class="@error('referencia_proveedor') is-invalid @enderror">
+                        </div>
+
+                        <div class="field-group field-full">
+                            <label for="descripcion">Descripcion del item</label>
+                            <input id="descripcion" name="descripcion" type="text" value="{{ old('descripcion') }}" placeholder="Nombre descriptivo completo del material o pieza industrial" class="@error('descripcion') is-invalid @enderror" required>
+                        </div>
+
+                        <div class="field-group">
+                            <label for="clase">Clase del producto</label>
+                            <input id="clase" name="clase" type="text" value="{{ old('clase') }}" placeholder="Ejem: EPI" class="@error('clase') is-invalid @enderror">
+                        </div>
+                    </div>
+                </section>
+
+                <section class="item-section">
+                    <aside class="item-section-label">
+                        <span>SECCION 2</span>
+                        <h2>Control de Existencias</h2>
+                        <p>Parametros de stock y ubicacion fisica dentro de los almacenes operativos.</p>
+                    </aside>
+
+                    <div class="item-section-fields fields-3">
+                        <div class="field-group field-tight">
+                            <label for="stock_actual">Stock inicial</label>
+                            <input id="stock_actual" name="stock_actual" type="number" min="0" step="1" value="{{ old('stock_actual', 0) }}" class="@error('stock_actual') is-invalid @enderror" required>
+                        </div>
+
+                        <div class="field-group field-tight">
+                            <label for="stock_minimo">Minimo stock (alerta)</label>
+                            <input id="stock_minimo" name="stock_minimo" type="number" min="0" step="1" value="{{ old('stock_minimo', 10) }}" class="@error('stock_minimo') is-invalid @enderror">
+                        </div>
+
+                        <div class="field-group field-tight">
+                            <label for="nivel_critico">Stock critico</label>
+                            <input id="nivel_critico" name="nivel_critico" type="number" min="0" step="1" value="{{ old('nivel_critico', 5) }}" class="@error('nivel_critico') is-invalid @enderror">
+                        </div>
+
+                        <div class="field-group">
+                            <label for="almacen">Almacen</label>
+                            <input id="almacen" name="almacen" type="text" value="{{ old('almacen') }}" placeholder="Almacen Central" class="@error('almacen') is-invalid @enderror">
+                        </div>
+
+                        <div class="field-group">
+                            <label for="ubicacion">Ubicacion</label>
+                            <input id="ubicacion" name="ubicacion" type="text" value="{{ old('ubicacion') }}" placeholder="Pasillo 3 / Estanteria 12" class="@error('ubicacion') is-invalid @enderror">
+                        </div>
+                    </div>
+                </section>
+
+                <section class="item-section">
+                    <aside class="item-section-label">
+                        <span>SECCION 3</span>
+                        <h2>Informacion Economica</h2>
+                        <p>Valoracion de activos y politica de margenes comerciales aplicados.</p>
+                    </aside>
+
+                    <div class="item-section-fields fields-1">
+                        <div class="field-group field-tight">
+                            <label for="precio_coste_preview">Precio de coste</label>
+                            <div class="currency-preview">
+                                <span>EUR</span>
+                                <input id="precio_coste_preview" type="text" value="0.00" readonly>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <footer class="item-form-footer">
+                    <p>* Todos los campos son obligatorios para el registro inicial.</p>
+                    <div class="item-footer-actions">
+                        <a href="{{ route('inventario.create') }}" class="btn-footer-cancel">Cancelar</a>
+                        <button type="submit" class="btn-footer-save">
+                            <i class="fas fa-save"></i>
+                            Guardar Producto
+                        </button>
+                    </div>
+                </footer>
+            </form>
+
+            <aside class="inventory-item-side">
+                <article class="side-card with-accent">
+                    <h3>Ultima accion</h3>
+                    @if ($ultimaAccion)
+                        <p>{{ $ultimaAccion->codigo }} - {{ $ultimaAccion->descripcion }}</p>
+                    @else
+                        <p>No hay registros previos en esta sesion.</p>
+                    @endif
+                </article>
+
+                <article class="side-card">
+                    <h3>Estado de conexion</h3>
+                    <p><i class="fas fa-circle"></i> Base de Datos: Sincronizada</p>
+                </article>
+            </aside>
+        </div>
+    </section>
+@endsection

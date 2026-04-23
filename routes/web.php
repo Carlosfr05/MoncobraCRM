@@ -76,6 +76,12 @@ Route::middleware('auth')->group(function () {
     
     // Nota: 'only' limita las rutas generadas para optimizar el sistema.
     Route::resource('productos', ProductoController::class)->only(['index']);
+    Route::post('inventario/entradas', [InventarioController::class, 'storeEntrada'])->name('inventario.entrada.store');
+    Route::get('inventario/salidas/nueva', [InventarioController::class, 'createSalida'])->name('inventario.salida.create');
+    Route::post('inventario/salidas', [InventarioController::class, 'storeSalida'])->name('inventario.salida.store');
+    Route::get('inventario/traslados/nuevo', [InventarioController::class, 'createTraslado'])->name('inventario.traslado.create');
+    Route::post('inventario/traslados', [InventarioController::class, 'storeTraslado'])->name('inventario.traslado.store');
+    Route::get('inventario/nuevo-item', [InventarioController::class, 'createItem'])->name('inventario.item.create');
     Route::resource('inventario', InventarioController::class);
     Route::resource('historico', HistoricoController::class)->only(['index']);
     

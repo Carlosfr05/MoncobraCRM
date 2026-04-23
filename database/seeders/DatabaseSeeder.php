@@ -24,6 +24,12 @@ class DatabaseSeeder extends Seeder
         // Crear presupuestos de ejemplo
         $this->call(PresupuestoSeeder::class);
 
+        // Crear albaranes de ejemplo
+        $this->call(AlbaranClienteSeeder::class);
+
+        // Crear inventario de ejemplo
+        $this->call(InventarioSeeder::class);
+
         // Crear usuarios con diferentes roles
         $this->call(UserSeeder::class);
     }
