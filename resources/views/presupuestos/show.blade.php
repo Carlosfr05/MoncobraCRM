@@ -1,60 +1,122 @@
 @extends('adminlte::page')
 
-@section('title', 'Detalle Presupuesto - MoncobraCRM')
+@section('title', 'Detalle de Presupuesto - MoncobraCRM')
 
-@section('header-title')
-    <i class="fas fa-file-contract"></i> Detalle de Presupuesto
+@section('css')
+    @vite(['resources/css/presupuestos-detail.css'])
+@endsection
+
+@section('content_header')
+    <div class="presupuesto-detail-header">
+        <div class="presupuesto-detail-header__copy">
+            <h1>Detalle de Presupuesto</h1>
+            <p>Consulta información general y desglose de artículos asociados.</p>
+        </div>
+
+        <div class="presupuesto-detail-header__actions">
+            <a href="{{ route('presupuestos.edit', $presupuesto) }}" class="presupuesto-detail-btn presupuesto-detail-btn--soft">
+                <i class="fas fa-pen" aria-hidden="true"></i>
+                Editar
+            </a>
+            <a href="{{ route('presupuestos.index') }}" class="presupuesto-detail-btn presupuesto-detail-btn--ghost">
+                <i class="fas fa-arrow-left" aria-hidden="true"></i>
+                Volver
+            </a>
+        </div>
+    </div>
 @endsection
 
 @section('content')
-    <section class="presupuesto-show-wrap">
-        <header class="presupuesto-show-head">
-            <div>
-                <h1>{{ $presupuesto->numero }}</h1>
-                <p>
-                    Cliente: {{ $presupuesto->cliente?->empresa_nombre ?: 'Sin cliente' }}
-                    | Fecha: {{ optional($presupuesto->fecha)->format('d/m/Y') ?: '-' }}
-                </p>
+    @php
+        $estado = (string) ($presupuesto->estado ?: 'pendiente');
+        $estadoClass = match (strtolower($estado)) {
+            'aceptado' => 'estado-pill estado-aceptado',
+            'rechazado' => 'estado-pill estado-rechazado',
+            'pendiente pedido' => 'estado-pill estado-pendiente-pedido',
+            default => 'estado-pill estado-pendiente',
+        };
+        $items = is_array($presupuesto->lista_articulos) ? $presupuesto->lista_articulos : [];
+    @endphp
+
+    <section class="presupuesto-detail-shell">
+        <article class="presupuesto-detail-card">
+            <header class="presupuesto-detail-card__head">
+                <h2>Resumen del presupuesto</h2>
+            </header>
+            <div class="presupuesto-detail-card__body">
+                <div class="presupuesto-summary-grid">
+                    <div class="summary-item">
+                        <span>Documento</span>
+                        <strong>{{ $presupuesto->documento ?: 'N/D' }}</strong>
+                    </div>
+                    <div class="summary-item">
+                        <span>Número</span>
+                        <strong>{{ $presupuesto->numero ?: 'N/D' }}</strong>
+                    </div>
+                    <div class="summary-item">
+                        <span>Fecha</span>
+                        <strong>{{ optional($presupuesto->fecha)->format('d/m/Y') ?: 'N/D' }}</strong>
+                    </div>
+                    <div class="summary-item">
+                        <span>Estado</span>
+                        <strong><span class="{{ $estadoClass }}">{{ ucfirst($estado) }}</span></strong>
+                    </div>
+                    <div class="summary-item summary-item--wide">
+                        <span>Cliente</span>
+                        <strong>{{ $presupuesto->cliente?->empresa_nombre ?? 'Sin cliente' }}</strong>
+                    </div>
+                    <div class="summary-item summary-item--wide">
+                        <span>Título</span>
+                        <strong>{{ $presupuesto->titulo ?: 'Sin título' }}</strong>
+                    </div>
+                    <div class="summary-item">
+                        <span>OT</span>
+                        <strong>{{ $presupuesto->ot ?: 'Sin OT' }}</strong>
+                    </div>
+                    <div class="summary-item">
+                        <span>Total</span>
+                        <strong>{{ number_format((float) ($presupuesto->total ?? 0), 2, ',', '.') }} EUR</strong>
+                    </div>
+                </div>
             </div>
-            <div class="presupuesto-show-actions">
-                @if ($presupuesto->archivo_pdf)
-                    <a href="{{ route('presupuestos.pdf', $presupuesto) }}" target="_blank" class="open-pdf-btn">Abrir PDF</a>
+        </article>
+
+        <article class="presupuesto-detail-card">
+            <header class="presupuesto-detail-card__head">
+                <h2>Lista de artículos</h2>
+            </header>
+            <div class="presupuesto-detail-card__body p-0">
+                @if (empty($items))
+                    <p class="presupuesto-empty-items">Este presupuesto no tiene artículos cargados.</p>
+                @else
+                    <div class="table-responsive presupuesto-items-table-wrap">
+                        <table class="table presupuesto-items-table mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Artículo</th>
+                                    <th>Descripción</th>
+                                    <th class="text-right">Cantidad</th>
+                                    <th class="text-right">Precio unitario</th>
+                                    <th class="text-right">Margen (%)</th>
+                                    <th class="text-right">Total línea</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($items as $item)
+                                    <tr>
+                                        <td data-label="Artículo">{{ $item['articulo'] ?? '-' }}</td>
+                                        <td data-label="Descripción">{{ $item['descripcion'] ?? '-' }}</td>
+                                        <td data-label="Cantidad" class="text-right">{{ number_format((float) ($item['cantidad'] ?? 0), 2, ',', '.') }}</td>
+                                        <td data-label="Precio unitario" class="text-right">{{ number_format((float) ($item['precio_unitario'] ?? 0), 2, ',', '.') }} EUR</td>
+                                        <td data-label="Margen (%)" class="text-right">{{ number_format((float) ($item['margen'] ?? 0), 2, ',', '.') }}</td>
+                                        <td data-label="Total línea" class="text-right">{{ number_format((float) ($item['total'] ?? 0), 2, ',', '.') }} EUR</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
                 @endif
-                <a href="{{ route('presupuestos.index') }}" class="back-btn">Volver</a>
             </div>
-        </header>
-
-        <article class="presupuesto-show-card">
-            <div class="presupuesto-meta-grid">
-                <div>
-                    <span class="meta-label">Documento</span>
-                    <p>{{ $presupuesto->documento }}</p>
-                </div>
-                <div>
-                    <span class="meta-label">OT</span>
-                    <p>{{ $presupuesto->ot ?: 'Sin OT' }}</p>
-                </div>
-                <div>
-                    <span class="meta-label">Titulo</span>
-                    <p>{{ $presupuesto->titulo ?: '-' }}</p>
-                </div>
-                <div>
-                    <span class="meta-label">Total</span>
-                    <p>{{ number_format((float) ($presupuesto->total ?? 0), 2, ',', '.') }}€</p>
-                </div>
-            </div>
-
-            @if ($presupuesto->archivo_pdf)
-                <div class="presupuesto-pdf-panel">
-                    <iframe src="{{ route('presupuestos.pdf', $presupuesto) }}#toolbar=1&navpanes=0&view=FitH" title="PDF presupuesto {{ $presupuesto->numero }}"></iframe>
-                </div>
-            @else
-                <p class="pdf-empty">Este presupuesto no tiene archivo PDF asociado.</p>
-            @endif
         </article>
     </section>
-@endsection
-
-@section('css')
-    @vite(['resources/css/presupuestos-show.css'])
 @endsection
