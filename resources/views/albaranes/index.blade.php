@@ -13,6 +13,10 @@
     @endphp
 
     <section class="albaranes-clientes-ui">
+        <section class="albaranes-page-head">
+            <h1>Albaranes Clientes</h1>
+        </section>
+
         @if (session('error'))
             <div class="albaranes-alert-error">
                 <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
@@ -76,10 +80,10 @@
                     <i class="fas fa-filter" aria-hidden="true"></i>
                     <input
                         type="text"
-                        name="ot"
-                        value="{{ $ot }}"
-                        placeholder="Filtrar por OT (ej: 383, 363)..."
-                        aria-label="Filtrar por OT"
+                        name="buscar"
+                        value="{{ $buscar }}"
+                        placeholder="Buscar por Nº albarán, presupuesto, OT, fecha, cliente, título, pedido, total o estado..."
+                        aria-label="Buscar albaranes"
                     >
                 </div>
 
@@ -119,7 +123,6 @@
                                 $estado = in_array((string) $albaran->estado, ['pendiente', 'recibido', 'entregado'], true)
                                     ? (string) $albaran->estado
                                     : 'pendiente';
-                                $bloqueado = $estado === 'entregado';
                                 $presupuestoNumero = trim((string) ($albaran->documento ?? ''));
                                 $pedidoNumero = trim((string) ($albaran->pedido_cliente ?? ''));
                                 $total = (float) ($albaran->ui_total ?? 0);
@@ -171,25 +174,19 @@
                                         <form method="POST" action="{{ route('albaranes.estado.update', $albaran) }}" class="estado-form">
                                             @csrf
                                             @method('PATCH')
-                                            <select name="estado" class="estado-select" onchange="this.form.submit()" aria-label="Cambiar estado" @disabled($bloqueado)>
+                                            <select name="estado" class="estado-select" onchange="this.form.submit()" aria-label="Cambiar estado">
                                                 <option value="pendiente" @selected($estado === 'pendiente')>Pendiente</option>
                                                 <option value="recibido" @selected($estado === 'recibido')>Recibido</option>
                                                 <option value="entregado" @selected($estado === 'entregado')>Entregado</option>
                                             </select>
                                         </form>
 
-                                        @if (!$bloqueado)
-                                            <a href="{{ route('albaranes.edit', $albaran) }}" class="accion-edit" title="Editar albarán">
-                                                <i class="far fa-edit"></i>
-                                            </a>
-                                        @else
-                                            <span class="accion-lock" title="Albarán bloqueado por estado entregado">
-                                                <i class="fas fa-lock"></i>
-                                            </span>
-                                        @endif
-
                                         <a href="{{ route('albaranes.pdf', $albaran) }}" class="accion-eye" title="Ver albarán">
                                             <i class="far fa-eye"></i>
+                                        </a>
+
+                                        <a href="{{ route('albaranes.pantalla-roja', $albaran) }}" class="accion-red" title="Editar albarán">
+                                            <i class="far fa-edit"></i>
                                         </a>
                                     </div>
                                 </td>

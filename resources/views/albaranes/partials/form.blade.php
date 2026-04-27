@@ -1,7 +1,6 @@
 @php
-    $isEdit = $mode === 'edit';
-    $formAction = $isEdit ? route('albaranes.update', $albaran) : route('albaranes.store');
-    $currentEstado = old('estado', $isEdit ? ($albaran->estado ?? 'pendiente') : 'pendiente');
+    $formAction = route('albaranes.store');
+    $currentEstado = old('estado', 'pendiente');
 
     $lineasIniciales = [];
     $lineasDesdeOld = old('lineas_json');
@@ -11,8 +10,6 @@
         if (is_array($decodedOld)) {
             $lineasIniciales = $decodedOld;
         }
-    } elseif ($isEdit && is_array($albaran->lista_articulos ?? null)) {
-        $lineasIniciales = $albaran->lista_articulos;
     }
 
     $lineasIniciales = collect($lineasIniciales)
@@ -42,12 +39,12 @@
             <span>/</span>
             <a href="{{ route('albaranes.index') }}">Albaranes</a>
             <span>/</span>
-            <strong>{{ $isEdit ? 'Editar Albaran Cliente' : 'Crear Albaran Cliente' }}</strong>
+            <strong>Crear Albaran Cliente</strong>
         </nav>
     </header>
 
     <section class="albaran-headline">
-        <h1>{{ $isEdit ? 'Editar Albaran Cliente' : 'Crear Albaran Cliente' }}</h1>
+        <h1>Crear Albaran Cliente</h1>
     </section>
 
     @if (session('error'))
@@ -73,9 +70,6 @@
 
     <form action="{{ $formAction }}" method="POST" enctype="multipart/form-data" class="albaran-form-layout" novalidate>
         @csrf
-        @if ($isEdit)
-            @method('PUT')
-        @endif
 
         <div class="albaran-main-col">
             <article class="albaran-card">
@@ -84,17 +78,17 @@
                 <div class="albaran-grid cols-3">
                     <div class="field-group">
                         <label for="documento">Documento</label>
-                        <input type="text" id="documento" name="documento" value="{{ old('documento', $isEdit ? $albaran->documento : '') }}" required>
+                        <input type="text" id="documento" name="documento" value="{{ old('documento') }}" required>
                     </div>
 
                     <div class="field-group">
                         <label for="numero">Numero</label>
-                        <input type="text" id="numero" name="numero" value="{{ old('numero', $isEdit ? $albaran->numero : '') }}" required>
+                        <input type="text" id="numero" name="numero" value="{{ old('numero') }}" required>
                     </div>
 
                     <div class="field-group">
                         <label for="fecha">Fecha</label>
-                        <input type="date" id="fecha" name="fecha" value="{{ old('fecha', $isEdit && $albaran->fecha ? $albaran->fecha->format('Y-m-d') : '') }}" required>
+                        <input type="date" id="fecha" name="fecha" value="{{ old('fecha') }}" required>
                     </div>
 
                     <div class="field-group">
@@ -102,7 +96,7 @@
                         <select id="cliente_id" name="cliente_id" required>
                             <option value="">Selecciona cliente...</option>
                             @foreach ($clientes as $cliente)
-                                <option value="{{ $cliente->id }}" @selected((string) old('cliente_id', $isEdit ? $albaran->cliente_id : '') === (string) $cliente->id)>
+                                <option value="{{ $cliente->id }}" @selected((string) old('cliente_id') === (string) $cliente->id)>
                                     {{ $cliente->empresa_nombre }}
                                 </option>
                             @endforeach
@@ -111,28 +105,22 @@
 
                     <div class="field-group">
                         <label for="ot">OT</label>
-                        <input type="text" id="ot" name="ot" value="{{ old('ot', $isEdit ? $albaran->ot : '') }}">
+                        <input type="text" id="ot" name="ot" value="{{ old('ot') }}">
                     </div>
 
                     <div class="field-group">
                         <label for="pedido_cliente">Pedido cliente</label>
-                        <input type="text" id="pedido_cliente" name="pedido_cliente" value="{{ old('pedido_cliente', $isEdit ? $albaran->pedido_cliente : '') }}">
+                        <input type="text" id="pedido_cliente" name="pedido_cliente" value="{{ old('pedido_cliente') }}">
                     </div>
 
                     <div class="field-group col-span-2">
                         <label for="titulo">Titulo</label>
-                        <input type="text" id="titulo" name="titulo" value="{{ old('titulo', $isEdit ? $albaran->titulo : '') }}">
+                        <input type="text" id="titulo" name="titulo" value="{{ old('titulo') }}">
                     </div>
 
                     <div class="field-group">
                         <label for="archivo_pdf">PDF del albaran</label>
                         <input type="file" id="archivo_pdf" name="archivo_pdf" accept="application/pdf">
-                        @if ($isEdit && !empty($albaran->archivo_pdf))
-                            <small>
-                                PDF actual:
-                                <a href="{{ route('albaranes.pdf', $albaran) }}" target="_blank">Abrir visor</a>
-                            </small>
-                        @endif
                     </div>
                 </div>
             </article>
@@ -142,7 +130,7 @@
                 <div class="linea-input-row">
                     <div class="field-group flex-2">
                         <label for="linea_descripcion">Descripcion</label>
-                        <input type="text" id="linea_descripcion" placeholder="Escriba el nombre del articulo...">
+                        <textarea id="linea_descripcion" placeholder="Escriba el nombre del articulo..."></textarea>
                     </div>
                     <div class="field-group flex-1">
                         <label for="linea_cantidad">Cantidad</label>
@@ -182,18 +170,7 @@
             </article>
 
             <article class="albaran-card albaran-bottom-bar">
-                @if ($isEdit)
-                    <div class="field-group estado-group">
-                        <label for="estado">Estado</label>
-                        <select id="estado" name="estado">
-                            <option value="pendiente" @selected($currentEstado === 'pendiente')>Pendiente</option>
-                            <option value="recibido" @selected($currentEstado === 'recibido')>Recibido</option>
-                            <option value="entregado" @selected($currentEstado === 'entregado')>Entregado</option>
-                        </select>
-                    </div>
-                @else
-                    <input type="hidden" name="estado" value="pendiente">
-                @endif
+                <input type="hidden" name="estado" value="pendiente">
 
                 <div class="albaran-total-box">
                     <span>TOTAL ALBARAN</span>

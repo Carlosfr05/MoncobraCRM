@@ -55,8 +55,7 @@
             <div class="clientes-tabs-row">
                 <nav class="clientes-tabs" aria-label="Estados de clientes">
                     <a href="{{ route('clientes.index', ['estado' => 'todos', 'buscar' => $buscar]) }}" class="{{ $estado === 'todos' ? 'is-active' : '' }}">Todos los Clientes</a>
-                    <a href="{{ route('clientes.index', ['estado' => 'activas', 'buscar' => $buscar]) }}" class="{{ $estado === 'activas' ? 'is-active' : '' }}">Cuentas Activas</a>
-                    <a href="{{ route('clientes.index', ['estado' => 'inactivas', 'buscar' => $buscar]) }}" class="{{ $estado === 'inactivas' ? 'is-active' : '' }}">Inactivos / Bajas</a>
+                    <a href="{{ route('clientes.index', ['estado' => 'favoritos', 'buscar' => $buscar]) }}" class="{{ $estado === 'favoritos' ? 'is-active' : '' }}">Favoritos</a>
                 </nav>
 
             </div>
@@ -79,6 +78,7 @@
                                 $key = $cliente->id % count($iconosIndustria);
                                 $otsActivas = (int) $cliente->albaranes_count + (int) $cliente->presupuestos_count + (int) $cliente->pedidos_clientes_count;
                                 $contacto = $cliente->persona_contacto ?: 'Sin asignar';
+                                $favoritoActivo = (bool) $cliente->favorito;
                             @endphp
                             <tr>
                                 <td>
@@ -105,6 +105,19 @@
                                 </td>
                                 <td>
                                     <div class="cliente-actions">
+                                        <form action="{{ route('clientes.favorito.toggle', $cliente->id) }}" method="POST" class="cliente-favorite-form">
+                                            @csrf
+                                            <input type="hidden" name="estado" value="{{ $estado }}">
+                                            <input type="hidden" name="buscar" value="{{ $buscar }}">
+                                            <button
+                                                type="submit"
+                                                class="cliente-favorite-btn {{ $favoritoActivo ? 'is-favorito' : '' }}"
+                                                title="{{ $favoritoActivo ? 'Quitar de favoritos' : 'Marcar como favorito' }}"
+                                                aria-label="{{ $favoritoActivo ? 'Quitar de favoritos' : 'Marcar como favorito' }}"
+                                            >
+                                                <i class="fas fa-heart"></i>
+                                            </button>
+                                        </form>
                                         <a href="{{ route('clientes.edit', $cliente->id) }}" class="cliente-action-icon" title="Editar cliente" aria-label="Editar cliente">
                                             <i class="fas fa-pen"></i>
                                         </a>

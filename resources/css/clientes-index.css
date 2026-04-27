@@ -295,6 +295,40 @@
     width: 100%;
 }
 
+.cliente-favorite-form {
+    margin: 0;
+}
+
+.cliente-favorite-btn {
+    width: 2.2rem;
+    height: 2.2rem;
+    border: 1px solid #d8e3f0;
+    border-radius: 0.65rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #8b97a8;
+    background: #f8fbff;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.cliente-favorite-btn:hover {
+    border-color: #ffb6c0;
+    color: #e23b57;
+}
+
+.cliente-favorite-btn.is-favorito {
+    color: #e23b57;
+    border-color: #f3a7b4;
+    background: #fff3f5;
+}
+
+.cliente-favorite-btn.is-favorito:hover {
+    color: #c91f43;
+    border-color: #ed879c;
+}
+
 .cliente-action-icon {
     width: 2.2rem;
     height: 2.2rem;

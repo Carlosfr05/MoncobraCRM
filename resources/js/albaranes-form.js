@@ -62,10 +62,20 @@ document.addEventListener("DOMContentLoaded", () => {
     let lineas = lineasFromInput.length > 0 ? lineasFromInput : lineasFromDataset;
     let selectedIndex = -1;
 
+    const autosizeDescripcion = () => {
+        if (descripcionInput.tagName !== "TEXTAREA") {
+            return;
+        }
+
+        descripcionInput.style.height = "auto";
+        descripcionInput.style.height = `${Math.min(descripcionInput.scrollHeight, 192)}px`;
+    };
+
     const resetInputs = () => {
         descripcionInput.value = "";
         cantidadInput.value = "1";
         precioInput.value = "0";
+        autosizeDescripcion();
         descripcionInput.focus();
     };
 
@@ -161,7 +171,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     addButton.addEventListener("click", saveCurrentInputs);
 
-    [descripcionInput, cantidadInput, precioInput].forEach((input) => {
+    [cantidadInput, precioInput].forEach((input) => {
         input.addEventListener("keydown", (event) => {
             if (event.key === "Enter") {
                 event.preventDefault();
@@ -169,6 +179,8 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
     });
+
+    descripcionInput.addEventListener("input", autosizeDescripcion);
 
     tableBody.addEventListener("click", (event) => {
         const target = event.target.closest("button[data-action]");
@@ -201,6 +213,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 precioInput.value = String(linea.precio);
                 addButton.innerHTML = '<i class="far fa-save"></i> Aplicar';
                 renderRows();
+                autosizeDescripcion();
                 descripcionInput.focus();
                 return;
             }
@@ -220,6 +233,7 @@ document.addEventListener("DOMContentLoaded", () => {
             cantidadInput.value = String(linea.cantidad);
             precioInput.value = String(linea.precio);
             addButton.innerHTML = '<i class="far fa-save"></i> Aplicar';
+            autosizeDescripcion();
             descripcionInput.focus();
         });
     }
@@ -236,5 +250,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    autosizeDescripcion();
     renderRows();
 });

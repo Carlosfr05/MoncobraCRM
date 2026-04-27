@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Almacen;
 use App\Models\Inventario;
 use Illuminate\Http\Request;
 
@@ -33,11 +34,12 @@ class InventarioController extends Controller
             ->where('ubicacion', '<>', '')
             ->distinct()
             ->count('ubicacion');
-        $almacenes = (clone $baseQuery)
-            ->whereNotNull('almacen')
-            ->where('almacen', '<>', '')
-            ->distinct()
-            ->count('almacen');
+        $almacenesRegistrados = Almacen::query()
+            ->where('proyecto_id', $proyectoId)
+            ->orderBy('nombre')
+            ->get(['id', 'nombre']);
+
+        $almacenes = $almacenesRegistrados->count();
 
         $movimientosRecientes = (clone $baseQuery)
             ->orderByDesc('updated_at')
@@ -65,23 +67,65 @@ class InventarioController extends Controller
                 ];
             });
 
-        $ocupacionAlmacenes = (clone $baseQuery)
+        $inventarioPorAlmacen = (clone $baseQuery)
             ->selectRaw('almacen, COUNT(*) as total_productos, SUM(stock_actual) as stock_total')
+            ->whereNotNull('almacen')
+            ->where('almacen', '<>', '')
             ->groupBy('almacen')
-            ->orderByDesc('total_productos')
             ->get()
-            ->map(function ($item) use ($totalProductos) {
-                $nombre = trim((string) ($item->almacen ?: 'Sin almacén'));
-                $total = (int) $item->total_productos;
+            ->mapWithKeys(function ($item) {
+                $nombre = trim((string) ($item->almacen ?? ''));
+
+                return [
+                    $nombre => (object) [
+                        'total_productos' => (int) ($item->total_productos ?? 0),
+                        'stock_total' => (int) ($item->stock_total ?? 0),
+                    ],
+                ];
+            });
+
+        $ocupacionAlmacenes = $almacenesRegistrados
+            ->map(function (Almacen $almacenItem) use ($inventarioPorAlmacen, $totalProductos) {
+                $nombre = trim((string) $almacenItem->nombre);
+                $inventario = $inventarioPorAlmacen->get($nombre);
+                $total = (int) ($inventario->total_productos ?? 0);
 
                 return (object) [
                     'nombre' => $nombre,
                     'total_productos' => $total,
-                    'stock_total' => (int) ($item->stock_total ?? 0),
-                    'porcentaje' => $totalProductos > 0 ? max(5, (int) round(($total * 100) / $totalProductos)) : 0,
+                    'stock_total' => (int) ($inventario->stock_total ?? 0),
+                    'porcentaje' => $totalProductos > 0 && $total > 0
+                        ? max(5, (int) round(($total * 100) / $totalProductos))
+                        : 0,
                 ];
             })
+            ->sortByDesc('total_productos')
             ->values();
+
+        // Include legacy warehouse names found in inventory that are not in almacenes table yet.
+        $nombresRegistrados = $almacenesRegistrados
+            ->map(fn (Almacen $almacenItem) => trim((string) $almacenItem->nombre))
+            ->filter()
+            ->values();
+
+        $ocupacionLegacy = $inventarioPorAlmacen
+            ->reject(fn ($item, $nombre) => $nombresRegistrados->contains($nombre))
+            ->map(function ($inventario, $nombre) use ($totalProductos) {
+                $total = (int) ($inventario->total_productos ?? 0);
+
+                return (object) [
+                    'nombre' => $nombre,
+                    'total_productos' => $total,
+                    'stock_total' => (int) ($inventario->stock_total ?? 0),
+                    'porcentaje' => $totalProductos > 0 && $total > 0
+                        ? max(5, (int) round(($total * 100) / $totalProductos))
+                        : 0,
+                ];
+            })
+            ->sortByDesc('total_productos')
+            ->values();
+
+        $ocupacionAlmacenes = $ocupacionAlmacenes->concat($ocupacionLegacy)->values();
 
         return view('inventario.index', compact(
             'inventarios',

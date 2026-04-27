@@ -39,21 +39,8 @@ class ClienteController extends Controller
             });
         }
 
-        if ($estado === 'activas') {
-            $clientesQuery->where(function ($query) {
-                $query->whereNotNull('email')->where('email', '!=', '')
-                    ->orWhereNotNull('telefono')->where('telefono', '!=', '');
-            });
-        } elseif ($estado === 'inactivas') {
-            $clientesQuery->where(function ($query) {
-                $query
-                    ->where(function ($subQuery) {
-                        $subQuery->whereNull('email')->orWhere('email', '=', '');
-                    })
-                    ->where(function ($subQuery) {
-                        $subQuery->whereNull('telefono')->orWhere('telefono', '=', '');
-                    });
-            });
+        if ($estado === 'favoritos') {
+            $clientesQuery->where('favorito', true);
         }
 
         $clientes = $clientesQuery
@@ -62,6 +49,29 @@ class ClienteController extends Controller
             ->withQueryString();
 
         return view('clientes.index', compact('clientes', 'buscar', 'estado'));
+    }
+
+    public function toggleFavorito(Request $request, Cliente $cliente)
+    {
+        $proyectoId = $this->resolveActiveProyectoId($request);
+
+        if ((int) $cliente->proyecto_id !== $proyectoId) {
+            abort(404);
+        }
+
+        $cliente->update([
+            'favorito' => ! (bool) $cliente->favorito,
+        ]);
+
+        $estado = (string) $request->input('estado', 'todos');
+        $buscar = trim((string) $request->input('buscar', ''));
+
+        return redirect()->route('clientes.index', [
+            'estado' => $estado,
+            'buscar' => $buscar,
+        ])->with('success', $cliente->favorito
+            ? 'Cliente marcado como favorito'
+            : 'Cliente eliminado de favoritos');
     }
 
     /**

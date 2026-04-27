@@ -271,7 +271,7 @@
                     </div>
 
                     <div class="inventory-sidebar-footer-actions">
-                        <a href="#" class="inventory-sidebar-btn">Crear almacén</a>
+                        <a href="{{ route('almacenes.create') }}" class="inventory-sidebar-btn">Crear almacén</a>
                         <a href="{{ route('inventario.traslado.create') }}" class="inventory-sidebar-btn">Trasladar</a>
                     </div>
                 </div>

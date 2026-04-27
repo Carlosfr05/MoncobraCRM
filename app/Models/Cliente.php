@@ -33,6 +33,16 @@ class Cliente extends Model
         'telefono',
         'email',
         'persona_contacto',
+        'favorito',
+    ];
+
+    /**
+     * Casts for model attributes.
+     *
+     * @var array<string, string>
+     */
+    protected $casts = [
+        'favorito' => 'boolean',
     ];
 
     /**

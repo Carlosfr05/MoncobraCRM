@@ -1,0 +1,260 @@
+.content-wrapper {
+    background:
+        radial-gradient(circle at top left, rgba(41, 76, 134, 0.08), transparent 26%),
+        radial-gradient(circle at top right, rgba(15, 41, 77, 0.08), transparent 24%),
+        #eef3fa;
+}
+
+.almacen-create-page {
+    min-height: calc(100vh - 90px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1.1rem;
+    padding: 1.25rem 0 1.75rem;
+    font-family: "Manrope", "Segoe UI", sans-serif;
+    color: #163251;
+}
+
+.almacen-success {
+    width: min(100%, 1000px);
+    margin-bottom: -0.15rem;
+    border: 1px solid #b7e6cb;
+    background: #ebf9f1;
+    color: #247a48;
+    border-radius: 0.72rem;
+    padding: 0.8rem 0.95rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    font-size: 0.85rem;
+    font-weight: 700;
+}
+
+.almacen-create-head {
+    text-align: center;
+    max-width: 760px;
+}
+
+.almacen-create-head h1 {
+    margin: 0;
+    color: #18395e;
+    font-size: 2rem;
+    line-height: 1.05;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+}
+
+.almacen-create-head p {
+    margin: 0.35rem 0 0;
+    color: #72849f;
+    font-size: 0.92rem;
+    font-weight: 600;
+}
+
+.almacen-create-shell {
+    width: min(100%, 1080px);
+    display: flex;
+    justify-content: center;
+}
+
+.almacen-create-card {
+    width: min(100%, 1000px);
+    background: rgba(255, 255, 255, 0.98);
+    border: 1px solid #dbe4f1;
+    border-radius: 0.8rem;
+    box-shadow: 0 18px 40px -34px rgba(22, 49, 79, 0.6);
+    padding: 1.35rem 1.3rem 1.2rem;
+}
+
+.almacen-form-grid {
+    display: grid;
+    gap: 1.2rem;
+}
+
+.field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.42rem;
+}
+
+.field-group label {
+    color: #657890;
+    font-size: 0.68rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.input-wrap {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    border: 1px solid #e2e8f1;
+    border-radius: 0.55rem;
+    background: #f7f8fb;
+    padding: 0.35rem 0.6rem;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.input-wrap i {
+    color: #90a0b5;
+    font-size: 0.85rem;
+    padding-top: 0.4rem;
+    flex: 0 0 auto;
+}
+
+.input-wrap input,
+.input-wrap textarea {
+    width: 100%;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: #2f4662;
+    font-size: 0.88rem;
+    font-weight: 600;
+    padding: 0.2rem 0;
+}
+
+.input-wrap input::placeholder,
+.input-wrap textarea::placeholder {
+    color: #9aabbe;
+    font-weight: 600;
+}
+
+.input-wrap textarea {
+    min-height: 68px;
+    resize: none;
+    line-height: 1.45;
+}
+
+.field-group:focus-within .input-wrap {
+    border-color: #7ea7e9;
+    background: #ffffff;
+    box-shadow: 0 0 0 3px rgba(52, 109, 214, 0.12);
+}
+
+.field-name .input-wrap {
+    width: 100%;
+    max-width: 340px;
+}
+
+.field-description .input-wrap {
+    min-height: 70px;
+}
+
+.almacen-create-actions {
+    margin-top: 1.05rem;
+    padding-top: 1rem;
+    border-top: 1px solid #edf1f7;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.btn-cancel,
+.btn-create {
+    min-height: 2.3rem;
+    border-radius: 0.55rem;
+    border: 1px solid transparent;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    font-size: 0.8rem;
+    font-weight: 800;
+    text-decoration: none;
+    padding: 0 1rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.btn-cancel {
+    background: #f4f7fb;
+    border-color: #d7dfeb;
+    color: #4c5f7a;
+}
+
+.btn-create {
+    background: #17395e;
+    border-color: #17395e;
+    color: #ffffff;
+    box-shadow: 0 10px 24px -16px rgba(23, 57, 94, 0.95);
+}
+
+.btn-cancel:hover,
+.btn-create:hover {
+    text-decoration: none;
+    transform: translateY(-1px);
+}
+
+.almacen-feature-grid {
+    width: min(100%, 1000px);
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.75rem;
+}
+
+.feature-card {
+    background: rgba(255, 255, 255, 0.55);
+    border: 1px solid rgba(221, 228, 239, 0.95);
+    border-radius: 0.7rem;
+    padding: 0.8rem 0.85rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.7rem;
+    color: #6c7d93;
+}
+
+.feature-card i {
+    color: #6f7f93;
+    font-size: 0.85rem;
+    margin-top: 0.15rem;
+}
+
+.feature-card h3 {
+    margin: 0;
+    color: #46607f;
+    font-size: 0.78rem;
+    font-weight: 800;
+}
+
+.feature-card p {
+    margin: 0.2rem 0 0;
+    font-size: 0.7rem;
+    line-height: 1.35;
+}
+
+@media (max-width: 900px) {
+    .almacen-create-page {
+        justify-content: flex-start;
+        padding: 1rem 0.85rem 1.5rem;
+    }
+
+    .almacen-create-head h1 {
+        font-size: 1.7rem;
+    }
+
+    .almacen-create-card {
+        padding: 1rem;
+    }
+
+    .field-name .input-wrap {
+        max-width: 100%;
+    }
+
+    .almacen-feature-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .almacen-create-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .btn-cancel,
+    .btn-create {
+        width: 100%;
+    }
+}

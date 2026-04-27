@@ -16,6 +16,7 @@ use App\Http\Controllers\HistoricoController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\GestionProyectoController;
 use App\Http\Controllers\ProyectoContextController;
+use App\Http\Controllers\AlmacenController;
 
 // 1. CAMBIO: Nombre de ruta único para la página de bienvenida.
 // Antes se llamaba 'dashboard', ahora 'welcome'.
@@ -62,10 +63,13 @@ Route::middleware('auth')->group(function () {
     
     // Recursos CRUD
     Route::resource('clientes', ClienteController::class);
+    Route::post('clientes/{cliente}/favorito', [ClienteController::class, 'toggleFavorito'])->name('clientes.favorito.toggle');
     Route::get('albaranes/{albaran}/pdf', [AlbaranClienteController::class, 'pdfViewer'])->name('albaranes.pdf');
     Route::get('albaranes/{albaran}/pdf/file', [AlbaranClienteController::class, 'streamPdf'])->name('albaranes.pdf.file');
+    Route::get('albaranes/{albaran}/pantalla-roja', [AlbaranClienteController::class, 'pantallaRoja'])->name('albaranes.pantalla-roja');
+    Route::put('albaranes/{albaran}/pantalla-roja', [AlbaranClienteController::class, 'updatePantallaRoja'])->name('albaranes.pantalla-roja.update');
     Route::patch('albaranes/{albaran}/estado', [AlbaranClienteController::class, 'updateEstado'])->name('albaranes.estado.update');
-    Route::resource('albaranes', AlbaranClienteController::class);
+    Route::resource('albaranes', AlbaranClienteController::class)->except(['edit', 'update']);
     Route::get('presupuestos/{presupuesto}/pdf', [PresupuestoController::class, 'viewPdf'])->name('presupuestos.pdf');
     Route::resource('presupuestos', PresupuestoController::class);
     Route::resource('bolsa', BolsaController::class);
@@ -87,6 +91,8 @@ Route::middleware('auth')->group(function () {
     Route::get('inventario/nuevo-item', [InventarioController::class, 'createItem'])->name('inventario.item.create');
     Route::resource('inventario', InventarioController::class);
     Route::resource('historico', HistoricoController::class)->only(['index']);
+    Route::get('almacenes/nuevo', [AlmacenController::class, 'create'])->name('almacenes.create');
+    Route::post('almacenes', [AlmacenController::class, 'store'])->name('almacenes.store');
     
     // Gestión de Usuarios (Solo admin y superadmin)
     Route::resource('users', UserController::class);

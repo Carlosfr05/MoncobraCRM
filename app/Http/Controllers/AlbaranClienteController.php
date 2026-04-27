@@ -22,7 +22,7 @@ class AlbaranClienteController extends Controller
     {
         $proyectoId = $this->resolveActiveProyectoId($request);
 
-        $ot = trim((string) $request->query('ot', ''));
+        $buscar = trim((string) $request->query('buscar', ''));
         $desde = trim((string) $request->query('desde', ''));
         $hasta = trim((string) $request->query('hasta', ''));
 
@@ -32,15 +32,39 @@ class AlbaranClienteController extends Controller
             ->orderByDesc('fecha')
             ->orderByDesc('id');
 
-        if ($ot !== '') {
-            $otTerms = collect(preg_split('/[\s,;]+/', $ot))
+        if ($buscar !== '') {
+            $buscarTerms = collect(preg_split('/[\s,;]+/', $buscar))
                 ->filter(fn ($value) => trim((string) $value) !== '')
                 ->values();
 
-            if ($otTerms->isNotEmpty()) {
-                $albaranesQuery->where(function ($query) use ($otTerms) {
-                    foreach ($otTerms as $otTerm) {
-                        $query->orWhere('ot', 'like', '%' . trim((string) $otTerm) . '%');
+            if ($buscarTerms->isNotEmpty()) {
+                $albaranesQuery->where(function ($query) use ($buscarTerms) {
+                    foreach ($buscarTerms as $term) {
+                        $normalizedTerm = trim((string) $term);
+
+                        $query->orWhere(function ($subQuery) use ($normalizedTerm) {
+                            $subQuery->where('numero', 'like', '%' . $normalizedTerm . '%')
+                                ->orWhere('documento', 'like', '%' . $normalizedTerm . '%')
+                                ->orWhere('ot', 'like', '%' . $normalizedTerm . '%')
+                                ->orWhere('pedido_cliente', 'like', '%' . $normalizedTerm . '%')
+                                ->orWhere('titulo', 'like', '%' . $normalizedTerm . '%')
+                                ->orWhere('estado', 'like', '%' . $normalizedTerm . '%')
+                                ->orWhereHas('cliente', function ($clienteQuery) use ($normalizedTerm) {
+                                    $clienteQuery->where('empresa_nombre', 'like', '%' . $normalizedTerm . '%');
+                                });
+
+                            if (is_numeric($normalizedTerm)) {
+                                $subQuery->orWhere('total', '=', (float) $normalizedTerm)
+                                    ->orWhere('total', 'like', '%' . $normalizedTerm . '%');
+                            }
+
+                            try {
+                                $fecha = Carbon::parse($normalizedTerm)->toDateString();
+                                $subQuery->orWhereDate('fecha', $fecha);
+                            } catch (\Throwable $exception) {
+                                // Ignore non-date search terms.
+                            }
+                        });
                     }
                 });
             }
@@ -130,7 +154,7 @@ class AlbaranClienteController extends Controller
 
         return view('albaranes.index', compact(
             'albaranes',
-            'ot',
+            'buscar',
             'desde',
             'hasta',
             'totalAlbaranes',
@@ -199,75 +223,6 @@ class AlbaranClienteController extends Controller
         ]);
     }
 
-    public function edit(Request $request, AlbaranCliente $albaran)
-    {
-        $proyectoId = $this->resolveActiveProyectoId($request);
-
-        if ((int) $albaran->proyecto_id !== $proyectoId) {
-            abort(404);
-        }
-
-        if ($this->isDelivered($albaran)) {
-            return redirect()->route('albaranes.index')->with('error', 'No se puede editar un albarán entregado.');
-        }
-
-        $clientes = Cliente::where('proyecto_id', $proyectoId)->orderBy('empresa_nombre')->get();
-
-        if ($albaran->cliente && !$clientes->contains('id', $albaran->cliente_id)) {
-            $clientes->prepend($albaran->cliente);
-        }
-
-        return view('albaranes.edit', compact('albaran', 'clientes'));
-    }
-
-    public function update(Request $request, AlbaranCliente $albaran)
-    {
-        $proyectoId = $albaran->proyecto_id ?: $this->resolveActiveProyectoId($request);
-
-        if ((int) $albaran->proyecto_id !== (int) $proyectoId) {
-            abort(404);
-        }
-
-        if ($this->isDelivered($albaran)) {
-            return redirect()->route('albaranes.index')->with('error', 'No se puede editar un albarán entregado.');
-        }
-
-        $validated = $request->validate([
-            'documento' => 'required|string',
-            'numero' => 'required|string',
-            'fecha' => 'required|date',
-            'cliente_id' => [
-                'required',
-                Rule::exists('clientes', 'id')->where(fn ($query) => $query->where('proyecto_id', $proyectoId)),
-            ],
-            'ot' => 'nullable|string|max:255',
-            'pedido_cliente' => 'nullable|string|max:255',
-            'titulo' => 'nullable|string|max:255',
-            'lineas_json' => 'nullable|json',
-            'estado' => ['nullable', Rule::in(['pendiente', 'recibido', 'entregado'])],
-            'archivo_pdf' => ['nullable', 'file', 'mimes:pdf', 'max:10240'],
-        ]);
-
-        $lineas = $this->normalizeLineas($validated['lineas_json'] ?? '[]');
-
-        $validated['proyecto_id'] = $proyectoId;
-        $validated['estado'] = $validated['estado'] ?? ($albaran->estado ?: 'pendiente');
-        $validated['lista_articulos'] = $lineas === [] ? null : $lineas;
-        $validated['total'] = collect($lineas)->sum(fn (array $linea) => (float) ($linea['total'] ?? 0));
-        unset($validated['lineas_json']);
-
-        if ($request->hasFile('archivo_pdf')) {
-            if ($albaran->archivo_pdf && Storage::disk('public')->exists($albaran->archivo_pdf)) {
-                Storage::disk('public')->delete($albaran->archivo_pdf);
-            }
-
-            $validated['archivo_pdf'] = $request->file('archivo_pdf')->store('albaranes', 'public');
-        }
-
-        $albaran->update($validated);
-        return redirect()->route('albaranes.index')->with('success', 'Albarán actualizado');
-    }
-
     public function pdfViewer(AlbaranCliente $albaran)
     {
         $proyectoId = $this->resolveActiveProyectoId(request());
@@ -303,6 +258,61 @@ class AlbaranClienteController extends Controller
             'Content-Type' => 'application/pdf',
             'Content-Disposition' => 'inline; filename="' . $fileName . '"',
         ]);
+    }
+
+    public function pantallaRoja(AlbaranCliente $albaran)
+    {
+        $proyectoId = $this->resolveActiveProyectoId(request());
+
+        if ((int) $albaran->proyecto_id !== $proyectoId) {
+            abort(404);
+        }
+
+        $clientes = Cliente::where('proyecto_id', $proyectoId)->orderBy('empresa_nombre')->get();
+
+        if ($albaran->cliente && !$clientes->contains('id', $albaran->cliente_id)) {
+            $clientes->prepend($albaran->cliente);
+        }
+
+        return view('albaranes.pantalla-roja', compact('albaran', 'clientes'));
+    }
+
+    public function updatePantallaRoja(Request $request, AlbaranCliente $albaran)
+    {
+        $proyectoId = $this->resolveActiveProyectoId($request);
+
+        if ((int) $albaran->proyecto_id !== $proyectoId) {
+            abort(404);
+        }
+
+        $validated = $request->validate([
+            'documento' => 'required|string',
+            'numero' => 'required|string',
+            'fecha' => 'required|date',
+            'cliente_id' => [
+                'required',
+                Rule::exists('clientes', 'id')->where(fn ($query) => $query->where('proyecto_id', $proyectoId)),
+            ],
+            'ot' => 'nullable|string|max:255',
+            'pedido_cliente' => 'nullable|string|max:255',
+            'titulo' => 'nullable|string|max:255',
+            'estado' => ['required', Rule::in(['pendiente', 'recibido', 'entregado'])],
+        ]);
+
+        $albaran->update([
+            'documento' => $validated['documento'],
+            'numero' => $validated['numero'],
+            'fecha' => $validated['fecha'],
+            'cliente_id' => $validated['cliente_id'],
+            'ot' => $validated['ot'] ?? null,
+            'pedido_cliente' => $validated['pedido_cliente'] ?? null,
+            'titulo' => $validated['titulo'] ?? null,
+            'estado' => $validated['estado'],
+        ]);
+
+        return redirect()
+            ->route('albaranes.pantalla-roja', $albaran)
+            ->with('success', 'Albarán actualizado correctamente.');
     }
 
     public function updateEstado(Request $request, AlbaranCliente $albaran)

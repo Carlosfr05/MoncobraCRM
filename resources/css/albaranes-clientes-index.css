@@ -5,6 +5,19 @@
 .albaranes-clientes-ui {
     color: #1e2a3a;
     font-family: "Segoe UI", "Source Sans Pro", sans-serif;
+    margin-top: 0.85rem;
+}
+
+.albaranes-page-head {
+    margin-bottom: 0.9rem;
+}
+
+.albaranes-page-head h1 {
+    margin: 0;
+    color: #18283f;
+    font-size: 1.95rem;
+    line-height: 1.05;
+    font-weight: 800;
 }
 
 .albaranes-alert-success {
@@ -357,6 +370,19 @@
     text-decoration: none;
 }
 
+.accion-red {
+    width: 1.95rem;
+    height: 1.95rem;
+    border: 1px solid #f2b9c2;
+    border-radius: 0.5rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #b12a3d;
+    background: #fff1f4;
+    text-decoration: none;
+}
+
 .accion-edit,
 .accion-lock {
     width: 1.95rem;
@@ -387,6 +413,12 @@
 .accion-eye:hover {
     color: #1f72d8;
     border-color: #b5cce9;
+}
+
+.accion-red:hover {
+    color: #ffffff;
+    background: #d43852;
+    border-color: #d43852;
 }
 
 .empty-row {
