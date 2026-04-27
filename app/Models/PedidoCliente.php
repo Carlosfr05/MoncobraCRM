@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Models\AlbaranCliente;
+use App\Models\Presupuesto;
 
 class PedidoCliente extends Model
 {
@@ -28,6 +30,10 @@ class PedidoCliente extends Model
         'numero_pedido',
         'fecha_pedido',
         'ot',
+        'presupuesto_id',
+        'albaran_id',
+        'estado',
+        'total',
         'lista_articulos',
     ];
 
@@ -38,6 +44,7 @@ class PedidoCliente extends Model
      */
     protected $casts = [
         'fecha_pedido' => 'date',
+        'total' => 'decimal:2',
         'lista_articulos' => 'array',
     ];
 
@@ -55,5 +62,21 @@ class PedidoCliente extends Model
     public function proyecto(): BelongsTo
     {
         return $this->belongsTo(Proyecto::class, 'proyecto_id');
+    }
+
+    /**
+     * Get the budget associated with the order.
+     */
+    public function presupuesto(): BelongsTo
+    {
+        return $this->belongsTo(Presupuesto::class, 'presupuesto_id');
+    }
+
+    /**
+     * Get the delivery note associated with the order.
+     */
+    public function albaran(): BelongsTo
+    {
+        return $this->belongsTo(AlbaranCliente::class, 'albaran_id');
     }
 }

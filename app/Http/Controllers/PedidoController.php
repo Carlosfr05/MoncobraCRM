@@ -2,20 +2,338 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AlbaranCliente;
+use App\Models\Cliente;
 use App\Models\PedidoCliente;
+use App\Models\Presupuesto;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class PedidoController extends Controller
 {
+    private const PEDIDO_CLIENTE_ESTADOS = [
+
+        'pendiente' => 'Pendiente',
+        'facturado' => 'Facturado',
+        'facturado_parcial' => 'Facturado parcial',
+    ];
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        return view('pedidos.index', [
-            'titulo' => 'Pedidos a Proveedores',
-            'breadcrumb' => 'Gestión de Pedidos'
+        return $this->indexClientes($request);
+    }
+
+    public function indexClientes(Request $request)
+    {
+        $proyectoId = $this->resolveActiveProyectoId($request);
+        $search = trim((string) $request->input('search', ''));
+        $estado = trim((string) $request->input('estado', ''));
+        $desde = trim((string) $request->input('desde', ''));
+        $hasta = trim((string) $request->input('hasta', ''));
+
+        $pedidosQuery = PedidoCliente::query()
+            ->with(['cliente', 'presupuesto', 'albaran'])
+            ->where('proyecto_id', $proyectoId);
+
+        if ($search !== '') {
+            $like = '%' . $search . '%';
+
+            $pedidosQuery->where(function ($query) use ($like) {
+                $query->where('numero_pedido', 'like', $like)
+                    ->orWhereHas('cliente', function ($clienteQuery) use ($like) {
+                        $clienteQuery->where('empresa_nombre', 'like', $like);
+                    });
+            });
+        }
+
+        if ($estado !== '' && array_key_exists($estado, self::PEDIDO_CLIENTE_ESTADOS)) {
+            $pedidosQuery->where('estado', $estado);
+        }
+
+        if ($desde !== '') {
+            try {
+                $pedidosQuery->whereDate('fecha_pedido', '>=', Carbon::parse($desde)->toDateString());
+            } catch (\Throwable $exception) {
+                // Ignore invalid dates.
+            }
+        }
+
+        if ($hasta !== '') {
+            try {
+                $pedidosQuery->whereDate('fecha_pedido', '<=', Carbon::parse($hasta)->toDateString());
+            } catch (\Throwable $exception) {
+                // Ignore invalid dates.
+            }
+        }
+
+        $pedidos = $pedidosQuery
+            ->orderByDesc('fecha_pedido')
+            ->orderByDesc('id')
+            ->paginate(8)
+            ->withQueryString();
+
+        $baseStatsQuery = PedidoCliente::query()->where('proyecto_id', $proyectoId);
+
+        $pedidosActivos = (clone $baseStatsQuery)
+            ->where(function ($query) {
+                $query->whereNull('estado')
+                    ->orWhereIn('estado', ['pendiente', 'facturado_parcial']);
+            })
+            ->count();
+
+        $pendientesAlbaran = (clone $baseStatsQuery)
+            ->where(function ($query) {
+                $query->whereNull('albaran_id')->orWhere('albaran_id', 0);
+            })
+            ->where(function ($query) {
+                $query->whereNull('estado')->orWhere('estado', 'pendiente');
+            })
+            ->count();
+
+        $inicioMesActual = now()->copy()->startOfMonth();
+        $inicioMesAnterior = now()->copy()->subMonthNoOverflow()->startOfMonth();
+        $finMesAnterior = now()->copy()->startOfMonth()->subDay();
+
+        $facturacionMensual = (float) (clone $baseStatsQuery)
+            ->whereBetween('fecha_pedido', [$inicioMesActual, now()])
+            ->sum('total');
+
+        $facturacionMesAnterior = (float) (clone $baseStatsQuery)
+            ->whereBetween('fecha_pedido', [$inicioMesAnterior, $finMesAnterior])
+            ->sum('total');
+
+        $variacionPedidos = (clone $baseStatsQuery)
+            ->whereBetween('fecha_pedido', [$inicioMesActual, now()])
+            ->count();
+
+        $variacionPedidosAnterior = (clone $baseStatsQuery)
+            ->whereBetween('fecha_pedido', [$inicioMesAnterior, $finMesAnterior])
+            ->count();
+        $variacionPedidosPorcentaje = $variacionPedidosAnterior > 0
+            ? round((($variacionPedidos - $variacionPedidosAnterior) / $variacionPedidosAnterior) * 100, 1)
+            : ($variacionPedidos > 0 ? 100.0 : 0.0);
+
+        $metaFacturacion = 500000;
+        $porcentajeMeta = $metaFacturacion > 0
+            ? min(100, round(($facturacionMensual / $metaFacturacion) * 100))
+            : 0;
+
+        $albaranesQuery = AlbaranCliente::query()->where('proyecto_id', $proyectoId);
+        $albaranesPendientesRelacionados = (clone $albaranesQuery)
+            ->whereNotNull('pedido_cliente')
+            ->where('estado', 'pendiente')
+            ->count();
+
+        $presupuestos = Presupuesto::query()
+            ->where('proyecto_id', $proyectoId)
+            ->get(['id', 'numero'])
+            ->keyBy('id');
+
+        $pedidos->getCollection()->transform(function (PedidoCliente $pedido) use ($presupuestos) {
+            $pedido->ui_estado = $pedido->estado ?: 'pendiente';
+            $pedido->ui_total = (float) ($pedido->total ?? 0);
+            $pedido->ui_presupuesto_numero = $pedido->presupuesto?->numero
+                ?: $presupuestos->get($pedido->presupuesto_id)?->numero;
+            $pedido->ui_albaran_numero = $pedido->albaran?->numero;
+            return $pedido;
+        });
+
+        return view('pedidos-clientes.index', [
+            'pedidos' => $pedidos,
+            'searchActual' => $search,
+            'estadoActual' => $estado,
+            'desdeActual' => $desde,
+            'hastaActual' => $hasta,
+            'pedidosActivos' => $pedidosActivos,
+            'pendientesAlbaran' => $pendientesAlbaran,
+            'albaranesPendientesRelacionados' => $albaranesPendientesRelacionados,
+            'facturacionMensual' => $facturacionMensual,
+            'facturacionMesAnterior' => $facturacionMesAnterior,
+            'variacionPedidosPorcentaje' => $variacionPedidosPorcentaje,
+            'metaFacturacion' => $metaFacturacion,
+            'porcentajeMeta' => $porcentajeMeta,
+            'titulo' => 'Pedidos de Clientes',
+            'breadcrumb' => 'Gestión de pedidos de clientes',
         ]);
+    }
+
+    public function createCliente(Request $request)
+    {
+        $proyectoId = $this->resolveActiveProyectoId($request);
+
+        $clientes = Cliente::query()
+            ->where('proyecto_id', $proyectoId)
+            ->orderBy('empresa_nombre')
+            ->get();
+
+        $presupuestos = Presupuesto::query()
+            ->where('proyecto_id', $proyectoId)
+            ->with('cliente')
+            ->orderByDesc('fecha')
+            ->orderByDesc('id')
+            ->get();
+
+        $presupuestoSeleccionadoId = (int) $request->query('presupuesto_id', 0);
+        $presupuestoSeleccionado = $presupuestoSeleccionadoId > 0
+            ? $presupuestos->firstWhere('id', $presupuestoSeleccionadoId)
+            : null;
+
+        $clienteSeleccionadoId = (int) $request->query('cliente_id', 0);
+        if ($clienteSeleccionadoId <= 0 && $presupuestoSeleccionado?->cliente_id) {
+            $clienteSeleccionadoId = (int) $presupuestoSeleccionado->cliente_id;
+        }
+
+        if ($clienteSeleccionadoId > 0 && !$clientes->contains('id', $clienteSeleccionadoId)) {
+            $clienteSeleccionadoId = 0;
+        }
+
+        $clienteSeleccionado = $clienteSeleccionadoId > 0
+            ? $clientes->firstWhere('id', $clienteSeleccionadoId)
+            : null;
+
+        if (!$clienteSeleccionado && $presupuestoSeleccionado?->cliente) {
+            $clienteSeleccionado = $presupuestoSeleccionado->cliente;
+            $clienteSeleccionadoId = (int) $clienteSeleccionado->id;
+        }
+
+        $numeroPedidoAuto = $this->resolveNextPedidoClienteNumber($proyectoId);
+        $fechaPedido = (string) $request->query('fecha_pedido', now()->toDateString());
+
+        $lineasIniciales = is_array($presupuestoSeleccionado?->lista_articulos)
+            ? $presupuestoSeleccionado->lista_articulos
+            : [];
+
+        $baseImponible = round((float) ($presupuestoSeleccionado?->total ?? 0), 2);
+        $iva = round($baseImponible * 0.21, 2);
+        $totalPedido = round($baseImponible + $iva, 2);
+        $presupuestosParaPedido = $presupuestos->map(function (Presupuesto $presupuesto) {
+            $lineas = is_array($presupuesto->lista_articulos) ? $presupuesto->lista_articulos : [];
+
+            return [
+                'id' => $presupuesto->id,
+                'cliente_id' => $presupuesto->cliente_id,
+                'numero' => $presupuesto->numero,
+                'titulo' => $presupuesto->titulo,
+                'cliente_nombre' => $presupuesto->cliente?->empresa_nombre,
+                'lineas' => collect($lineas)
+                    ->filter(fn ($linea) => is_array($linea) && !empty(trim((string) ($linea['descripcion'] ?? ''))))
+                    ->map(function (array $linea) {
+                        $cantidad = max(0, (float) ($linea['cantidad'] ?? 0));
+                        $precioUnitario = max(0, (float) ($linea['precio_unitario'] ?? 0));
+                        $margen = max(0, (float) ($linea['margen'] ?? 0));
+                        $total = isset($linea['total']) ? (float) $linea['total'] : $cantidad * $precioUnitario * (1 + ($margen / 100));
+
+                        return [
+                            'articulo' => trim((string) ($linea['articulo'] ?? '')),
+                            'descripcion' => trim((string) ($linea['descripcion'] ?? '')),
+                            'cantidad' => round($cantidad, 2),
+                            'precio_unitario' => round($precioUnitario, 2),
+                            'margen' => round($margen, 2),
+                            'total' => round($total, 2),
+                        ];
+                    })
+                    ->values()
+                    ->all(),
+            ];
+        })->values()->all();
+
+        return view('pedidos-clientes.create', compact(
+            'clientes',
+            'clienteSeleccionado',
+            'clienteSeleccionadoId',
+            'presupuestos',
+            'presupuestoSeleccionado',
+            'presupuestoSeleccionadoId',
+            'numeroPedidoAuto',
+            'fechaPedido',
+            'lineasIniciales',
+            'presupuestosParaPedido',
+            'baseImponible',
+            'iva',
+            'totalPedido'
+        ) + [
+            'titulo' => 'Crear Nuevo Pedido',
+            'breadcrumb' => 'Nuevo Pedido',
+        ]);
+    }
+
+    public function storeCliente(Request $request)
+    {
+        $proyectoId = $this->resolveActiveProyectoId($request);
+
+        $validated = $request->validate([
+            'numero_pedido' => 'required|string|max:80',
+            'fecha_pedido' => 'required|date',
+            'id_cliente' => [
+                'required',
+                'integer',
+                'exists:clientes,id',
+            ],
+            'ot' => 'nullable|string|max:100',
+            'presupuesto_id' => 'nullable|integer|exists:presupuestos,id',
+            'estado' => 'nullable|string|max:30',
+            'total' => 'nullable|numeric|min:0',
+            'lista_articulos' => 'nullable|json',
+        ]);
+
+        $clienteValido = Cliente::query()
+            ->where('proyecto_id', $proyectoId)
+            ->where('id', $validated['id_cliente'])
+            ->exists();
+
+        if (!$clienteValido) {
+            abort(404);
+        }
+
+        $presupuestoId = null;
+        if (!empty($validated['presupuesto_id'])) {
+            $presupuestoId = Presupuesto::query()
+                ->where('proyecto_id', $proyectoId)
+                ->where('id', $validated['presupuesto_id'])
+                ->value('id');
+        }
+
+        $lineas = json_decode((string) ($validated['lista_articulos'] ?? '[]'), true);
+        $lineas = is_array($lineas) ? $lineas : [];
+
+        $lineas = collect($lineas)
+            ->filter(fn ($linea) => is_array($linea) && !empty(trim((string) ($linea['descripcion'] ?? ''))))
+            ->map(function (array $linea) {
+                $cantidad = max(0, (float) ($linea['cantidad'] ?? 0));
+                $precioUnitario = max(0, (float) ($linea['precio_unitario'] ?? 0));
+                $margen = max(0, (float) ($linea['margen'] ?? 0));
+                $total = isset($linea['total']) ? (float) $linea['total'] : $cantidad * $precioUnitario * (1 + ($margen / 100));
+
+                return [
+                    'articulo' => trim((string) ($linea['articulo'] ?? '')),
+                    'descripcion' => trim((string) ($linea['descripcion'] ?? '')),
+                    'cantidad' => round($cantidad, 2),
+                    'precio_unitario' => round($precioUnitario, 2),
+                    'margen' => round($margen, 2),
+                    'total' => round($total, 2),
+                ];
+            })
+            ->values()
+            ->all();
+
+        $total = (float) ($validated['total'] ?? collect($lineas)->sum('total'));
+
+        PedidoCliente::create([
+            'id_cliente' => $validated['id_cliente'],
+            'proyecto_id' => $proyectoId,
+            'numero_pedido' => $validated['numero_pedido'],
+            'fecha_pedido' => Carbon::parse($validated['fecha_pedido'])->toDateString(),
+            'ot' => $validated['ot'] ?? null,
+            'presupuesto_id' => $presupuestoId,
+            'albaran_id' => null,
+            'estado' => $validated['estado'] ?? 'pendiente',
+            'total' => round($total, 2),
+            'lista_articulos' => $lineas ?: null,
+        ]);
+
+        return redirect()->route('pedidos-clientes.index')->with('success', 'Pedido de cliente creado correctamente');
     }
 
     /**
@@ -90,5 +408,14 @@ class PedidoController extends Controller
     public function destroy(string $id)
     {
         //
+    }
+
+    private function resolveNextPedidoClienteNumber(int $proyectoId): string
+    {
+        $nextIndex = (int) PedidoCliente::query()
+            ->where('proyecto_id', $proyectoId)
+            ->count() + 1;
+
+        return sprintf('PC-%s-%03d', now()->format('Y'), $nextIndex);
     }
 }

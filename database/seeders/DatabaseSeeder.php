@@ -27,6 +27,9 @@ class DatabaseSeeder extends Seeder
         // Crear albaranes de ejemplo
         $this->call(AlbaranClienteSeeder::class);
 
+        // Crear pedidos de cliente de ejemplo
+        $this->call(PedidoClienteSeeder::class);
+
         // Crear inventario de ejemplo
         $this->call(InventarioSeeder::class);
 
